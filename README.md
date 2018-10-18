@@ -7,8 +7,8 @@
 ## Group Information
 * Group name: autodiff-cs207
 * Members:
-    * Claire Stolz
-    * Abhimanyu Talwar
-    * Feng Qian (Nick)
-    * Christy Cheng
+     * Claire Stolz
+     * Abhimanyu Talwar
+     * Feng Qian (Nick)
+     * Christy Cheng
  
