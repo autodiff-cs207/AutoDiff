@@ -1,3 +1,5 @@
+import math
+
 class DiffObj():
     SUPPORTED_OPERATORS = ['add', 'subtract', 'multiply', 'divide',
             'power']
@@ -24,6 +26,8 @@ class DiffObj():
         if not with_respect_to: with_respect_to = self.name_list
         df = {}
         op1, op2 = self.operand_list[0], self.operand_list[1]
+        op1_val = op1.get_val(value_dict)
+        op2_val = op2.get_val(value_dict)
 
         if self.operator == 'add':
             for w in with_respect_to:
@@ -35,14 +39,19 @@ class DiffObj():
                 df[w] = dw
         elif self.operator == 'multiply':
             for w in with_respect_to:
-                dw = op1.get_der(value_dict, [w])[w]*op2.get_val(value_dict) + op2.get_der(value_dict, [w])[w]*op1.get_val(value_dict)
+                dw = op1.get_der(value_dict, [w])[w]*op2_val + op2.get_der(value_dict, [w])[w]*op1_val
                 df[w] = dw
         elif self.operator == 'divide':
-            op1_val = op1.get_val(value_dict)
-            op2_val = op2.get_val(value_dict)
             for w in with_respect_to:
                 dw = (op2_val*op1.get_der(value_dict, [w])[w] - op1_val*op2.get_der(value_dict, [w])[w])/(op2_val**2)
                 df[w] = dw
+        elif self.operator == 'power':
+            func_val = op1_val**op2_val
+            for w in with_respect_to:
+                dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w] + 
+                        math.log(op1_val)*op2.get_der(value_dict, [w])[w])
+                df[w] = dw
+        if len(df) == 0: df = {'' : 0}
         return df
 
     def getBinaryOperator(self, other, operator_name):
@@ -90,6 +99,7 @@ class Constant(DiffObj):
         super(Constant, self).__init__([], None, None)
         self.const_name = const_name
         self.const_val = const_val
+        self.name_list = []
     def get_val(self, value_dict):
         return self.const_val
     def get_der(self, value_dict, with_respect_to=None):
@@ -99,4 +109,58 @@ class Constant(DiffObj):
         for w in with_respect_to:
             der_dict[w] = 0
         return der_dict
- 
+
+class MathOps(DiffObj):
+    def __init__(self, name_list, operator, operand):
+        super(MathOps, self).__init__(name_list, 
+                operator, operand)
+    @classmethod
+    def getUnaryOperator(cls, operator, obj):
+        try:
+            name_list = obj.name_list
+            return MathOps(name_list, operator, [obj]) 
+        except AttributeError:
+            print('Only objects of type DiffObj are permitted.')
+    @classmethod
+    def sin(cls, obj):
+        return MathOps.getUnaryOperator('sin', obj)
+    @classmethod
+    def cos(cls, obj):
+        return MathOps.getUnaryOperator('cos', obj)
+    @classmethod
+    def log(cls, obj):
+        return MathOps.getUnaryOperator('log', obj)
+    def get_val(self, value_dict):
+        operand_val = self.operand_list[0].get_val(value_dict)
+        if self.operator == 'sin':
+            return math.sin(operand_val)
+        elif self.operator == 'cos':
+            return math.cos(operand_val)
+        elif self.operator == 'tan':
+            return math.tan(operand_val)
+        elif self.operator == 'log':
+            return math.log(operand_val)
+
+    def get_der(self, value_dict, with_respect_to=None):
+        if not with_respect_to: with_respect_to = self.name_list
+        df = {}
+        op1 = self.operand_list[0]
+        if self.operator == 'sin':
+            for w in with_respect_to:
+                dw = math.cos(op1.get_val(value_dict))*op1.get_der(value_dict, [w])[w]
+                df[w] = dw
+        elif self.operator == 'cos':
+            for w in with_respect_to:
+                dw = -math.sin(op1.get_val(value_dict))*op1.get_der(value_dict, [w])[w]
+                df[w] = dw
+        elif self.operator == 'tan':
+            for w in with_respect_to:
+                dw = (1.0/math.cos(op1.get_val(value_dict))**2)*op1.get_der(value_dict, [w])[w]
+                df[w] = dw
+        elif self.operator == 'log':
+            for w in with_respect_to:
+                dw = 1.0/op1.get_val(value_dict)*op1.get_der(value_dict, [w])[w]
+                df[w] = dw
+
+        if len(df) == 0: df = {'' : 0}
+        return df
