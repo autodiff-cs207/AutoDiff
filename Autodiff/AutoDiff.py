@@ -18,7 +18,7 @@ class DiffObj():
         elif self.operator == 'divide':
             return self.operand_list[0].get_val(value_dict)/self.operand_list[1].get_val(value_dict)
         elif self.operator == 'power':
-            return self.operand_list[0].get_val(value_dict)/self.operand_list[1].get_val(value_dict)
+            return self.operand_list[0].get_val(value_dict)**self.operand_list[1].get_val(value_dict)
 
     def get_der(self, value_dict, with_respect_to=None):
         if not with_respect_to: with_respect_to = self.name_list
@@ -29,9 +29,19 @@ class DiffObj():
             for w in with_respect_to:
                 dw = op1.get_der(value_dict, [w])[w] + op2.get_der(value_dict, [w])[w]
                 df[w] = dw
+        elif self.operator == 'subtract':
+            for w in with_respect_to:
+                dw = op1.get_der(value_dict, [w])[w] - op2.get_der(value_dict, [w])[w]
+                df[w] = dw
         elif self.operator == 'multiply':
             for w in with_respect_to:
                 dw = op1.get_der(value_dict, [w])[w]*op2.get_val(value_dict) + op2.get_der(value_dict, [w])[w]*op1.get_val(value_dict)
+                df[w] = dw
+        elif self.operator == 'divide':
+            op1_val = op1.get_val(value_dict)
+            op2_val = op2.get_val(value_dict)
+            for w in with_respect_to:
+                dw = (op2_val*op1.get_der(value_dict, [w])[w] - op1_val*op2.get_der(value_dict, [w])[w])/(op2_val**2)
                 df[w] = dw
         return df
 
@@ -77,9 +87,16 @@ class Variable(DiffObj):
 
 class Constant(DiffObj):
     def __init__(self, const_name, const_val):
+        super(Constant, self).__init__([], None, None)
         self.const_name = const_name
         self.const_val = const_val
     def get_val(self, value_dict):
         return self.const_val
-    def get_der(self, value_dict):
-        return 0
+    def get_der(self, value_dict, with_respect_to=None):
+        if not with_respect_to:
+            return {'' : 0}
+        der_dict = {}
+        for w in with_respect_to:
+            der_dict[w] = 0
+        return der_dict
+ 
