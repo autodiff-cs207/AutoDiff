@@ -12,3 +12,9 @@
      * Feng Qian (Nick)
      * Christy Cheng
  
+### Install
+
+After cloning, please run:
+```
+python setup.py install
+```
