@@ -59,8 +59,8 @@ class DiffObj():
             other_name_list = other.name_list
             return DiffObj(self.name_list + other_name_list,
                     operator_name, [self, other])
-        except AttributeError:
-            print('Operands need to be of type DiffObj.')
+        except:
+            raise AttributeError('Operands need to be of type DiffObj.')
 
     def __add__(self, other):
         return self.getBinaryOperator(other, 'add')
@@ -119,8 +119,8 @@ class MathOps(DiffObj):
         try:
             name_list = obj.name_list
             return MathOps(name_list, operator, [obj]) 
-        except AttributeError:
-            print('Only objects of type DiffObj are permitted.')
+        except:
+            raise AttributeError('Only objects of type DiffObj are permitted.')
     @classmethod
     def sin(cls, obj):
         return MathOps.getUnaryOperator('sin', obj)

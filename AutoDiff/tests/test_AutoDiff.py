@@ -226,6 +226,18 @@ class TestAutoDiff():
 		assert(f2.get_der(val_dict)['x'] == math.log(5)*(1/10))
 		assert(f2.get_der(val_dict)['y'] == math.log(10)*(1/5))
 
+	def test_exceptions(self):
+		val_dict = {'x' : 10, 'y' : 5}
+		x = Variable('x')
+		y = Variable('y')
+		c1 = Constant('c1',2.0)	
+		
+		with pytest.raises(AttributeError):
+			x+5
+		with pytest.raises(TypeError):
+			5+x 	
+		with pytest.raises(AttributeError):
+			mo.log(5)
 
 
 
