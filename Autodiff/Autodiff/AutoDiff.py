@@ -128,6 +128,9 @@ class MathOps(DiffObj):
     def cos(cls, obj):
         return MathOps.getUnaryOperator('cos', obj)
     @classmethod
+    def tan(cls,obj):
+        return MathOps.getUnaryOperator('tan', obj)
+    @classmethod
     def log(cls, obj):
         return MathOps.getUnaryOperator('log', obj)
     def get_val(self, value_dict):
