@@ -1,7 +1,7 @@
 import pytest 
 import math
-from Autodiff.AutoDiff import DiffObj, Variable, Constant
-from Autodiff.AutoDiff import MathOps as mo
+from AutoDiff.AutoDiff import DiffObj, Variable, Constant
+from AutoDiff.AutoDiff import MathOps as mo
 
 class TestAutoDiff():
 
