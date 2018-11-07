@@ -1,4 +1,4 @@
-1- What are the core data structures?
+ What are the core data structures?
 
 There are three core data structures in our implementation: 
 1) The list of names that is stored in every Diffobj instance to indicate the component of the instance. Eg. for the equation w=sin(x)+y, the name list of variable x is ['x'], the name list of variable y is ['y'] and the name list of function w is ['w','x','y']. For more details, please look into the test examples in the [DiffObj.py] directly.
