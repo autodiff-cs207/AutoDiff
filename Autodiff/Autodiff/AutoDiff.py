@@ -48,8 +48,11 @@ class DiffObj():
         elif self.operator == 'power':
             func_val = op1_val**op2_val
             for w in with_respect_to:
-                dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w] + 
-                        math.log(op1_val)*op2.get_der(value_dict, [w])[w])
+                try:
+                    dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w] + 
+                            math.log(op1_val)*op2.get_der(value_dict, [w])[w])
+                except:
+                    raise ValueError('Derivative is only defined for positive Base in an Exponentiation.')
                 df[w] = dw
         if len(df) == 0: df = {'' : 0}
         return df
@@ -142,7 +145,11 @@ class MathOps(DiffObj):
         elif self.operator == 'tan':
             return math.tan(operand_val)
         elif self.operator == 'log':
-            return math.log(operand_val)
+            try:
+                result = math.log(operand_val)
+                return result
+            except:
+                raise ValueError('Only positive values are permitted with log.')
 
     def get_der(self, value_dict, with_respect_to=None):
         if not with_respect_to: with_respect_to = self.name_list
