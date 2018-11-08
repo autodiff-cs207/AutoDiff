@@ -1,6 +1,6 @@
 import math
 
-class DiffObj():
+class DiffObj(object):
     '''
     All functions will be represented by an instance of this class DiffObj, or by instances of
     classes which inherit from DiffObj (e.g. class Variable, class Constant etc.) DiffObj enforces
