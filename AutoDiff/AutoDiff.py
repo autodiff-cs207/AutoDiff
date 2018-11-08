@@ -1,6 +1,6 @@
 import math
 
-class DiffObj():
+class DiffObj(object):
     SUPPORTED_OPERATORS = ['add', 'subtract', 'multiply', 'divide',
             'power']
     def __init__(self, name_list, operator, operand_list):
