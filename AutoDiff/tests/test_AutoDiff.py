@@ -262,8 +262,7 @@ class TestAutoDiff():
 			f0.get_val({'p':5})
 		with pytest.raises(ValueError):
 			f0.get_val({'x':'hello'})
-		# f1 = x/c1
-		# assert(f1.get_der(val_dict)['y'] == {'x' : 1})
+
 
 	def test_neg(self):
 		val_dict = {'x' : 10, 'y' : 5}
