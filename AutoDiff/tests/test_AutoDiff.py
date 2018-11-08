@@ -7,9 +7,10 @@ class TestAutoDiff():
 
 	# test add 
 	def test_add(self):  
-		val_dict = {'x' : 10, 'y' : 20}
+		val_dict = {'x' : 10, 'y' : 20, 'z':1}
 		x = Variable('x')
 		y = Variable('y')
+		z = Variable('z')
 		c1 = Constant('c1', 5)
 
 		f0 = x + y		     
@@ -39,6 +40,7 @@ class TestAutoDiff():
 
 		assert(c1.get_der(val_dict, ['x', 'y'])['x'] == 0)
 		assert(c1.get_der(val_dict, ['x', 'y'])['y'] == 0)
+
 
 	# test subtract 
 	def test_subtract(self):
@@ -207,10 +209,13 @@ class TestAutoDiff():
 		assert(f5.get_der(val_dict)['x']) == 1/math.cos(0)**2
 
 
+
 	def test_log(self):
-		val_dict = {'x' : 10, 'y' : 5}
+		val_dict = {'x' : 10, 'y' : 5, 'z' : -1, 'a' : 0}
 		x = Variable('x')
 		y = Variable('y')
+		z = Variable('z')
+		a = Variable('a')
 		c1 = Constant('c1',2.0)	
 
 		f0 = mo.log(x)
@@ -226,18 +231,67 @@ class TestAutoDiff():
 		assert(f2.get_der(val_dict)['x'] == math.log(5)*(1/10))
 		assert(f2.get_der(val_dict)['y'] == math.log(10)*(1/5))
 
+		with pytest.raises(ValueError):
+			f2 = mo.log(z)
+			f2.get_val(val_dict)['z']
+
+		with pytest.raises(ValueError):
+			f2 = mo.log(a)
+			f2.get_der(val_dict)['a']
+
+
 	def test_exceptions(self):
 		val_dict = {'x' : 10, 'y' : 5}
 		x = Variable('x')
 		y = Variable('y')
 		c1 = Constant('c1',2.0)	
+		c2 = Constant('c2', 0.0)
 		
-		with pytest.raises(AttributeError):
+		with pytest.raises(TypeError):
 			x+5
 		with pytest.raises(TypeError):
 			5+x 	
-		with pytest.raises(AttributeError):
+		with pytest.raises(TypeError):
 			mo.log(5)
+		with pytest.raises(ValueError):
+			f0 = x/c2
+			f0.get_val(val_dict)
+		with pytest.raises(ValueError):
+			f0.get_der(val_dict)['p']
+		with pytest.raises(ValueError):
+			f0.get_val({'p':5})
+		with pytest.raises(ValueError):
+			f0.get_val({'x':'hello'})
+		# f1 = x/c1
+		# assert(f1.get_der(val_dict)['y'] == {'x' : 1})
+
+	def test_neg(self):
+		val_dict = {'x' : 10, 'y' : 5}
+		x = Variable('x')
+		y = Variable('y')
+		c1 = Constant('c1',2.0)	
+
+		f1 = c1*x
+		f2 = -f1
+		assert(f2.get_val(val_dict) == -20.0)
+
+		f3 = x*y
+		f4 = -f3 
+		assert(f4.get_val(val_dict) == -50.0)
+		assert(f4.get_der(val_dict)['x']==-5)
+		assert(f4.get_der(val_dict)['y']==-10)
+
+	def test_divide_by_zero_dir(self):
+		val_dict = {'x' : 0}
+		x = Variable('x')
+		y = Variable('y')
+		c1 = Constant('c1',1/3)
+
+		f0 = x**c1
+		with pytest.raises(ValueError):
+			f0.get_der(val_dict)['x']
+
+
 
 
 

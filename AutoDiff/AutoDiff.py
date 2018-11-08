@@ -9,8 +9,7 @@ class DiffObj():
         self.operand_list = operand_list
     def get_val(self, value_dict):
         if self.operator not in DiffObj.OVERLOADED_OPERATORS:
-            print('{} is not a supported operator'.format(self.operator))
-            return
+            raise ValueError('{} is not a supported operator'.format(self.operator))
         if self.operator == 'add':
             return self.operand_list[0].get_val(value_dict) + self.operand_list[1].get_val(value_dict)
         elif self.operator == 'subtract':
@@ -147,7 +146,7 @@ class MathOps(DiffObj):
             name_list = obj.name_list
             return MathOps(name_list, operator, [obj]) 
         except:
-            raise AttributeError('Only objects of type DiffObj are permitted.')
+            raise TypeError('Only objects of type DiffObj are permitted.')
     @classmethod
     def sin(cls, obj):
         return MathOps.getUnaryOperator('sin', obj)
@@ -167,11 +166,8 @@ class MathOps(DiffObj):
         elif self.operator == 'cos':
             return math.cos(operand_val)
         elif self.operator == 'tan':
-            try:
-                result = math.tan(operand_val)
-                return result
-            except:
-                raise ValueError('Tan(x) is not defined at this point.')
+            result = math.tan(operand_val)
+            return result
         elif self.operator == 'log':
             try:
                 result = math.log(operand_val)
@@ -192,10 +188,7 @@ class MathOps(DiffObj):
                 dw = -math.sin(op1.get_val(value_dict))*op1.get_der(value_dict, [w])[w]
                 df[w] = dw
         elif self.operator == 'tan':
-            try:
-                sec_x = 1.0/math.cos(op1.get_val(value_dict))
-            except:
-                raise ValueError('Sec(x) cannot be evaluated at this value.')
+            sec_x = 1.0/math.cos(op1.get_val(value_dict))
             for w in with_respect_to:
                 dw = (sec_x**2)*op1.get_der(value_dict, [w])[w]
                 df[w] = dw
