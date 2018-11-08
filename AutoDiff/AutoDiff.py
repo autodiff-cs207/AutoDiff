@@ -8,6 +8,17 @@ class DiffObj():
         self.operator = operator
         self.operand_list = operand_list
     def get_val(self, value_dict):
+        '''
+        INPUT
+        ======
+        value_dict:     A dictionary, whose keys are strings representing variables which feature
+                        in the formula represented by this DiffObj. The values at those keys are
+                        the values at which the formula representing this DiffObj will be evaluated.
+        OUTPUT
+        ======
+        result:         A floating point number, which equals the evaluation of the function
+                        represented by this DiffObj, at the variable values given by val_dict.
+        '''
         if self.operator not in DiffObj.OVERLOADED_OPERATORS:
             raise ValueError('{} is not a supported operator'.format(self.operator))
         if self.operator == 'add':
@@ -28,6 +39,23 @@ class DiffObj():
             return -self.operand_list[0].get_val(value_dict)
 
     def get_der(self, value_dict, with_respect_to=None):
+        '''
+        INPUT
+        ======
+        value_dict:         A dictionary, whose keys are strings representing variables which feature
+                            in the formula represented by this DiffObj. The values at those keys are
+                            the values at which the gradient of formula representing this DiffObj will 
+                            be evaluated.
+        OUTPUT
+        ======
+        result:             A dictionary, whose keys are strings representing variables which feature 
+                            in the formula represented by this DiffObj. The value associated withe each
+                            key is a floating point number which is the partial derivative of this DiffObj 
+                            with respect to that variable.
+        with_respect_to:    A list of strings representing variables, with respect to which we want the 
+                            gradient of this DifObj. By default, if this list is not provided, then the
+                            gradient with respect to all variables featuring in the DiffObj is returned.
+        '''
         if not with_respect_to: with_respect_to = self.name_list
         df = {}
         op1, op2 = self.operand_list[0], self.operand_list[1]
