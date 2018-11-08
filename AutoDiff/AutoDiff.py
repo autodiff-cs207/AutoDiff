@@ -92,6 +92,10 @@ class DiffObj():
         return self.getBinaryOperator(other, 'divide')
     def __pow__(self, other):
         return self.getBinaryOperator(other, 'power')
+    __radd__ = __add__
+    __rsub__ = __sub__
+    __rmul__ = __mul__
+    __rtruediv__ = __truediv__
     
    
 class Variable(DiffObj):
