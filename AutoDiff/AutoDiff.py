@@ -1,6 +1,37 @@
 import math
 
 class DiffObj():
+    '''
+    All functions will be represented by an instance of this class DiffObj, or by instances of
+    classes which inherit from DiffObj (e.g. class Variable, class Constant etc.) DiffObj enforces
+    that each class which inherits from it, must implement two functions:
+
+    CLASS FUNCTIONS
+    ==================
+    The functions get_val and get_der are exposed to the user, that is, a user of our package can
+    call these functions.
+
+    (1) get_val:        This is used to evaluate the function represented by a DiffObj instance at
+                        a particular point.
+                        
+    (2) get_der:        This is used to evalate the gradient of the function repreesnted by a DiffObj
+                        instance, at a particular point.
+
+    CLASS ATTRIBUTES
+    ================
+    The attributes are not meant to be used by an end-user of our package, and they are meant for internal
+    computation.
+
+    name_list:          A list of strings, where each item in the list represents the variables inside
+                        the function represented by this DiffObj. E.g. for f(x,y) = x + y, the name_list
+                        for a DiffObj representing f will be ['x', 'y'] (assuming the x.name_list = ['x']
+                        and y.name_list = ['y'].
+    operator:           A single string representing the "operator". By default, DiffObj assumes that it
+                        represents two DiffObj's connected by an binary operator such as 'add'. However, 
+                        we use the same definition for unary operators such as negation or cosine.
+    operand_list:       A list of two DiffObjs, which together with self.operator, comprise this instance
+                        of DiffObj.
+    '''
     OVERLOADED_OPERATORS = ['add', 'subtract', 'multiply', 'divide',
             'power', 'neg']
     def __init__(self, name_list, operator, operand_list):
@@ -14,6 +45,9 @@ class DiffObj():
         value_dict:     A dictionary, whose keys are strings representing variables which feature
                         in the formula represented by this DiffObj. The values at those keys are
                         the values at which the formula representing this DiffObj will be evaluated.
+
+                        E.g. For a DiffObj which represents the function f(x,y) = x + y, the value_dict
+                        argument may look like value_dict = {'x': 10, 'y': 5}
         OUTPUT
         ======
         result:         A floating point number, which equals the evaluation of the function
@@ -46,6 +80,9 @@ class DiffObj():
                             in the formula represented by this DiffObj. The values at those keys are
                             the values at which the gradient of formula representing this DiffObj will 
                             be evaluated.
+                            
+                            E.g. For a DiffObj which represents the function f(x,y) = x + y, the value_dict
+                            argument may look like value_dict = {'x': 10, 'y': 5}
         OUTPUT
         ======
         result:             A dictionary, whose keys are strings representing variables which feature 
@@ -108,6 +145,25 @@ class DiffObj():
             raise TypeError('Operands need to be of type DiffObj.')
 
     def __neg__(self):
+        '''
+        Overloads negation for objects of type DiffObj.
+        INPUT
+        =====
+        Takes a single AutoDiff object (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
+
+        a = AutoDiff object
+
+        -a
+
+        which uses our __neg__ method.
+        a.__neg__()
+        
+        OUTPUT
+        ======
+        result:         A DiffObj, for which DiffObj.operator_name is 'neg', DiffObj.operand_list 
+                        contains [a,a], and DiffObj.name_list is same as the original name_list of a.
+                        
+        '''
         return self.getBinaryOperator(self, 'neg')
     def __add__(self, other):
         '''
@@ -225,6 +281,24 @@ class DiffObj():
         '''
         return self.getBinaryOperator(other, 'divide')
     def __pow__(self, other):
+        '''
+        Overloads the power operator such that it works for DiffObj objects.
+        INPUT
+        =====
+        self, other:        Two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, 
+                            AutoDiff.Variable, or AutoDiff.MathOps
+
+        Example Usage:
+        If a and b are two AutoDiff Objects. Then a**b will use our __pow__ method.
+
+
+        OUTPUT
+        ======
+        result:             A DiffObj where DiffObj.name_list is the concatenation of a.name_list and 
+                            b.name_list, DiffObj.operator_name is 'power', and DiffObj.operand_list is
+                            [a,b].
+
+        '''
         return self.getBinaryOperator(other, 'power')
     __radd__ = __add__
     __rsub__ = __sub__
@@ -294,6 +368,9 @@ class MathOps(DiffObj):
     @classmethod
     def log(cls, obj):
         return MathOps.getUnaryOperator('log', obj)
+    @classmethod
+    def exp(cls, obj):
+        return MathOps.getUnaryOperator('exp', obj)
     def get_val(self, value_dict):
         operand_val = self.operand_list[0].get_val(value_dict)
         if self.operator == 'sin':
@@ -309,6 +386,9 @@ class MathOps(DiffObj):
                 return result
             except:
                 raise ValueError('Only positive values are permitted with log.')
+        elif self.operator == 'exp':
+            result = math.exp(operand_val)
+            return result
 
     def get_der(self, value_dict, with_respect_to=None):
         if not with_respect_to: with_respect_to = self.name_list
@@ -334,6 +414,11 @@ class MathOps(DiffObj):
                 raise ValueError('Log cannot be evaluated at 0.')
             for w in with_respect_to:
                 dw = one_by_var*op1.get_der(value_dict, [w])[w]
+                df[w] = dw
+        elif self.operator == 'exp':
+            func_val = math.exp(op1.get_val(value_dict))
+            for w in with_respect_to:
+                dw = func_val*op1.get_der(value_dict, [w])[w]
                 df[w] = dw
 
         if len(df) == 0: df = {'' : 0}
