@@ -346,6 +346,32 @@ class Constant(DiffObj):
         return der_dict
 
 class MathOps(DiffObj):
+    '''
+    This class inherits from the DiffObj class. It implements non-elementary unary functions 
+    including: sin, cos, tan, log, exp.
+
+    INSTANTIATION
+    ===============
+    If a is of type DiffObj, then the invoking the constructor as follows will return an 
+    object b of type MathOps:
+
+    b = MathOps.sin(a)
+
+    CLASS ATTRIBUTES
+    ================
+    The attributes are not meant to be used by an end-user of our package, and they are meant for internal
+    computation.
+
+    name_list:          A list of strings, where each item in the list represents the variables inside
+                        the function represented by this DiffObj. E.g. for f(x,y) = x + y, the name_list
+                        for a DiffObj representing f will be ['x', 'y'] (assuming the x.name_list = ['x']
+                        and y.name_list = ['y'].
+    operator:           A string, such as 'sin' or 'log', which represents one of the unary math operators
+                        implemented by this class.
+    operand_list:       A list of length 1 containing the DiffObj which the user has passed as an argument
+                        to one of the classmethods of MathOps.
+
+    '''
     def __init__(self, name_list, operator, operand):
         super(MathOps, self).__init__(name_list, 
                 operator, operand)
@@ -358,20 +384,88 @@ class MathOps(DiffObj):
             raise TypeError('Only objects of type DiffObj are permitted.')
     @classmethod
     def sin(cls, obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the sine function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'sin' and whose operand is
+                    the DiffObj on which the user had called this sin function.
+        '''
         return MathOps.getUnaryOperator('sin', obj)
     @classmethod
     def cos(cls, obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the cos function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'cos' and whose operand is
+                    the DiffObj on which the user had called this cos function.
+        '''
         return MathOps.getUnaryOperator('cos', obj)
     @classmethod
     def tan(cls,obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the tan function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'sin' and whose operand is
+                    the DiffObj on which the user had called this tan function.
+        '''
+
         return MathOps.getUnaryOperator('tan', obj)
     @classmethod
     def log(cls, obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the natural log function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'sin' and whose operand is
+                    the DiffObj on which the user had called this log function.
+        '''
+
         return MathOps.getUnaryOperator('log', obj)
     @classmethod
     def exp(cls, obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the natural exponentiation function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'sin' and whose operand is
+                    the DiffObj on which the user had called this exp function.
+        '''
+
         return MathOps.getUnaryOperator('exp', obj)
     def get_val(self, value_dict):
+        '''
+        INPUT
+        ======
+        value_dict:     A dictionary, whose keys are strings representing variables which feature
+                        in the formula represented by this DiffObj. The values at those keys are
+                        the values at which the formula representing this DiffObj will be evaluated.
+
+                        E.g. For a DiffObj which represents the function f(x,y) = x + y, the value_dict
+                        argument may look like value_dict = {'x': 10, 'y': 5}
+        OUTPUT
+        ======
+        result:         A floating point number, which equals the evaluation of the function
+                        represented by this DiffObj, at the variable values given by val_dict.
+        '''
+ 
         operand_val = self.operand_list[0].get_val(value_dict)
         if self.operator == 'sin':
             return math.sin(operand_val)
@@ -391,6 +485,27 @@ class MathOps(DiffObj):
             return result
 
     def get_der(self, value_dict, with_respect_to=None):
+        '''
+        INPUT
+        ======
+        value_dict:         A dictionary, whose keys are strings representing variables which feature
+                            in the formula represented by this DiffObj. The values at those keys are
+                            the values at which the gradient of formula representing this DiffObj will 
+                            be evaluated.
+                            
+                            E.g. For a DiffObj which represents the function f(x,y) = x + y, the value_dict
+                            argument may look like value_dict = {'x': 10, 'y': 5}
+        OUTPUT
+        ======
+        result:             A dictionary, whose keys are strings representing variables which feature 
+                            in the formula represented by this DiffObj. The value associated withe each
+                            key is a floating point number which is the partial derivative of this DiffObj 
+                            with respect to that variable.
+        with_respect_to:    A list of strings representing variables, with respect to which we want the 
+                            gradient of this DifObj. By default, if this list is not provided, then the
+                            gradient with respect to all variables featuring in the DiffObj is returned.
+        '''
+ 
         if not with_respect_to: with_respect_to = self.name_list
         df = {}
         op1 = self.operand_list[0]
