@@ -1,14 +1,14 @@
 import math
 
 class DiffObj():
-    SUPPORTED_OPERATORS = ['add', 'subtract', 'multiply', 'divide',
-            'power']
+    OVERLOADED_OPERATORS = ['add', 'subtract', 'multiply', 'divide',
+            'power', 'neg']
     def __init__(self, name_list, operator, operand_list):
         self.name_list = name_list
         self.operator = operator
         self.operand_list = operand_list
     def get_val(self, value_dict):
-        if self.operator not in DiffObj.SUPPORTED_OPERATORS:
+        if self.operator not in DiffObj.OVERLOADED_OPERATORS:
             print('{} is not a supported operator'.format(self.operator))
             return
         if self.operator == 'add':
@@ -21,6 +21,8 @@ class DiffObj():
             return self.operand_list[0].get_val(value_dict)/self.operand_list[1].get_val(value_dict)
         elif self.operator == 'power':
             return self.operand_list[0].get_val(value_dict)**self.operand_list[1].get_val(value_dict)
+        elif self.operator == 'neg':
+            return -self.operand_list[0].get_val(value_dict)
 
     def get_der(self, value_dict, with_respect_to=None):
         if not with_respect_to: with_respect_to = self.name_list
@@ -54,17 +56,24 @@ class DiffObj():
                 except:
                     raise ValueError('Derivative is only defined for positive Base in an Exponentiation.')
                 df[w] = dw
+        elif self.operator == 'neg':
+            for w in with_respect_to:
+                dw = -op1.get_der(value_dict, [w])[w]
+                df[w] = dw
         if len(df) == 0: df = {'' : 0}
         return df
 
     def getBinaryOperator(self, other, operator_name):
         try:
             other_name_list = other.name_list
+            if operator_name == 'neg': other_name_list = []
             return DiffObj(self.name_list + other_name_list,
                     operator_name, [self, other])
         except:
-            raise AttributeError('Operands need to be of type DiffObj.')
+            raise TypeError('Operands need to be of type DiffObj.')
 
+    def __neg__(self):
+        return self.getBinaryOperator(self, 'neg')
     def __add__(self, other):
         return self.getBinaryOperator(other, 'add')
     def __sub__(self, other):
@@ -84,8 +93,7 @@ class Variable(DiffObj):
     
     def get_val(self, value_dict):
         if self.var_name not in value_dict:
-            print('You have not provided a value for {}'.format(self.var_name))
-            return
+            raise ValueError('You have not provided a value for {}'.format(self.var_name))
         return value_dict[self.var_name]
     
     def get_der(self, value_dict, with_respect_to=None):
