@@ -18,7 +18,11 @@ class DiffObj():
         elif self.operator == 'multiply':
             return self.operand_list[0].get_val(value_dict)*self.operand_list[1].get_val(value_dict)
         elif self.operator == 'divide':
-            return self.operand_list[0].get_val(value_dict)/self.operand_list[1].get_val(value_dict)
+            try:
+                result = self.operand_list[0].get_val(value_dict)/self.operand_list[1].get_val(value_dict)
+                return result
+            except:
+                raise ValueError('Division by zeros is not allowed')
         elif self.operator == 'power':
             return self.operand_list[0].get_val(value_dict)**self.operand_list[1].get_val(value_dict)
         elif self.operator == 'neg':
@@ -44,6 +48,10 @@ class DiffObj():
                 dw = op1.get_der(value_dict, [w])[w]*op2_val + op2.get_der(value_dict, [w])[w]*op1_val
                 df[w] = dw
         elif self.operator == 'divide':
+            try:
+                one_by_op2_val = 1.0/op2_val
+            except:
+                raise ValueError('Division by zero is not allowed')
             for w in with_respect_to:
                 dw = (op2_val*op1.get_der(value_dict, [w])[w] - op1_val*op2.get_der(value_dict, [w])[w])/(op2_val**2)
                 df[w] = dw
@@ -94,6 +102,10 @@ class Variable(DiffObj):
     def get_val(self, value_dict):
         if self.var_name not in value_dict:
             raise ValueError('You have not provided a value for {}'.format(self.var_name))
+        try:
+            temp = value_dict[self.var_name] + 0.0
+        except:
+            raise TypeError('Only integer and float types are accepted as values.')
         return value_dict[self.var_name]
     
     def get_der(self, value_dict, with_respect_to=None):
@@ -151,7 +163,11 @@ class MathOps(DiffObj):
         elif self.operator == 'cos':
             return math.cos(operand_val)
         elif self.operator == 'tan':
-            return math.tan(operand_val)
+            try:
+                result = math.tan(operand_val)
+                return result
+            except:
+                raise ValueError('Tan(x) is not defined at this point.')
         elif self.operator == 'log':
             try:
                 result = math.log(operand_val)
@@ -172,12 +188,20 @@ class MathOps(DiffObj):
                 dw = -math.sin(op1.get_val(value_dict))*op1.get_der(value_dict, [w])[w]
                 df[w] = dw
         elif self.operator == 'tan':
+            try:
+                sec_x = 1.0/math.cos(op1.get_val(value_dict))
+            except:
+                raise ValueError('Sec(x) cannot be evaluated at this value.')
             for w in with_respect_to:
-                dw = (1.0/math.cos(op1.get_val(value_dict))**2)*op1.get_der(value_dict, [w])[w]
+                dw = (sec_x**2)*op1.get_der(value_dict, [w])[w]
                 df[w] = dw
         elif self.operator == 'log':
+            try:
+                one_by_var = 1.0/op1.get_val(value_dict)
+            except:
+                raise ValueError('Log cannot be evaluated at 0.')
             for w in with_respect_to:
-                dw = 1.0/op1.get_val(value_dict)*op1.get_der(value_dict, [w])[w]
+                dw = one_by_var*op1.get_der(value_dict, [w])[w]
                 df[w] = dw
 
         if len(df) == 0: df = {'' : 0}
