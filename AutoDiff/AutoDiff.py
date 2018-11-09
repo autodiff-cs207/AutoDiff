@@ -50,6 +50,14 @@ class DiffObj(object):
                         argument may look like value_dict = {'x': 10, 'y': 5}
         OUTPUT
         ======
+
+        DOCTEST
+        ======
+        >>> z=x+y
+        >>> z.get_val({'x':1,'y':1})
+        2
+
+
         result:         A floating point number, which equals the evaluation of the function
                         represented by this DiffObj, at the variable values given by val_dict.
         '''
@@ -92,6 +100,13 @@ class DiffObj(object):
         with_respect_to:    A list of strings representing variables, with respect to which we want the 
                             gradient of this DifObj. By default, if this list is not provided, then the
                             gradient with respect to all variables featuring in the DiffObj is returned.
+
+        DOCTEST
+        ======
+        >>> z=x+y
+        >>> z.get_der({'x':0,'y':0})
+        {'y': 1, 'x': 1}
+
         '''
         if not with_respect_to: with_respect_to = self.name_list
         df = {}
@@ -538,3 +553,7 @@ class MathOps(DiffObj):
 
         if len(df) == 0: df = {'' : 0}
         return df
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(extraglobs={'x': Variable('x'),'y':Variable('y')})
