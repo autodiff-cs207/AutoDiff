@@ -377,6 +377,13 @@ class DiffObj(object):
                             b.name_list, DiffObj.operator_name is 'power', and DiffObj.operand_list is
                             [a,b].
 
+        DOCTEST
+        ======
+        >>> z=x*y
+        >>> z.get_val({'x':3,'y':2})
+        6
+        >>> z.get_der({'x':3,'y':2})
+        {'y': 3, 'x': 2}
         '''
         return self.getBinaryOperator(other, 'power')
     __radd__ = __add__
@@ -472,6 +479,15 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'sin' and whose operand is
                     the DiffObj on which the user had called this sin function.
+
+        DOCTEST
+        ======
+        >>> z=MathOps.sin(x)
+        >>> z.get_val({'x':math.pi})
+        1.2246467991473532e-16
+        >>> z.get_der({'x':math.pi})
+        {'x': -1.0}
+        
         '''
         return MathOps.getUnaryOperator('sin', obj)
     @classmethod
@@ -485,6 +501,14 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'cos' and whose operand is
                     the DiffObj on which the user had called this cos function.
+        DOCTEST
+        ======
+        
+        >>> z=MathOps.cos(x)
+        >>> z.get_val({'x':math.pi})
+        -1.0
+        >>> z.get_der({'x':math.pi})
+        {'x': -1.2246467991473532e-16}
         '''
         return MathOps.getUnaryOperator('cos', obj)
     @classmethod
@@ -498,6 +522,15 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'sin' and whose operand is
                     the DiffObj on which the user had called this tan function.
+
+        DOCTEST
+        ======
+        
+        >>> z=MathOps.tan(x)
+        >>> z.get_val({'x':0})
+        0.0
+        >>> z.get_der({'x':0})
+        {'x': 1.0}
         '''
 
         return MathOps.getUnaryOperator('tan', obj)
@@ -512,6 +545,14 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'sin' and whose operand is
                     the DiffObj on which the user had called this log function.
+
+        DOCTEST
+        ======
+        >>> z=MathOps.log(x)
+        >>> z.get_val({'x':1})
+        0.0
+        >>> z.get_der({'x':1})
+        {'x': 1.0}
         '''
 
         return MathOps.getUnaryOperator('log', obj)
@@ -526,6 +567,11 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'sin' and whose operand is
                     the DiffObj on which the user had called this exp function.
+        >>> z=MathOps.exp(x)
+        >>> z.get_val({'x':0})
+        1.0
+        >>> z.get_der({'x':0})
+        {'x': 1.0}
         '''
 
         return MathOps.getUnaryOperator('exp', obj)
