@@ -177,6 +177,14 @@ class DiffObj(object):
         ======
         result:         A DiffObj, for which DiffObj.operator_name is 'neg', DiffObj.operand_list 
                         contains [a,a], and DiffObj.name_list is same as the original name_list of a.
+
+        DOCTEST
+        ======
+        >>> z=-y
+        >>> z.get_val({'x':3,'y':2})
+        -2
+        >>> z.get_der({'x':3,'y':2})
+        {'y': -1}
                         
         '''
         return self.getBinaryOperator(self, 'neg')
@@ -207,7 +215,17 @@ class DiffObj(object):
         In other words, DiffObj.get_val(val_dict) returns the sum of the operands after
         their values are evaluated individually with respect to their own value dictionaries.
 
+        DOCTEST
+        ======
+        >>> z=x+y
+        >>> z.get_val({'x':3,'y':2})
+        5
+        >>> z.get_der({'x':3,'y':2})
+        {'y': 1, 'x': 1}
+
         '''
+
+
         return self.getBinaryOperator(other, 'add')
     def __sub__(self, other):
         '''
@@ -235,6 +253,14 @@ class DiffObj(object):
         DiffObj.operand_list[0].get_val(val_dict) - DiffObj.operand_list[1].get_val(val_dict) is returned.
         In other words, DiffObj.get_val(val_dict) returns the difference of the operands after
         their values are evaluated individually with respect to their own value dictionaries.
+
+        DOCTEST
+        ======
+        >>> z=x-y
+        >>> z.get_val({'x':3,'y':2})
+        1
+        >>> z.get_der({'x':3,'y':2})
+        {'y': -1, 'x': 1}
 
         '''
         return self.getBinaryOperator(other, 'subtract')
@@ -264,6 +290,16 @@ class DiffObj(object):
         DiffObj.operand_list[0].get_val(val_dict) * DiffObj.operand_list[1].get_val(val_dict) is returned.
         In other words, DiffObj.get_val(val_dict) returns the product of the operands after
         their values are evaluated individually with respect to their own value dictionaries.
+
+
+        DOCTEST
+        ======
+        >>> z=x*y
+        >>> z.get_val({'x':3,'y':2})
+        6
+        >>> z.get_der({'x':3,'y':2})
+        {'y': 3, 'x': 2}
+
         '''
         return self.getBinaryOperator(other, 'multiply')
     def __truediv__(self, other):
@@ -292,6 +328,8 @@ class DiffObj(object):
         DiffObj.operand_list[0].get_val(val_dict) / DiffObj.operand_list[1].get_val(val_dict) is returned.
         In other words, DiffObj.get_val(val_dict) returns the division of the operands after
         their values are evaluated individually with respect to their own value dictionaries.
+
+        
 
         '''
         return self.getBinaryOperator(other, 'divide')
