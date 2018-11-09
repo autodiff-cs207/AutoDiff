@@ -389,6 +389,7 @@ class DiffObj(object):
     __radd__ = __add__
     __rsub__ = __sub__
     __rmul__ = __mul__
+    __rpow__ = __pow__
     __rtruediv__ = __truediv__
     
    
