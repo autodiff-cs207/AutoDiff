@@ -302,6 +302,7 @@ class DiffObj(object):
 
         '''
         return self.getBinaryOperator(other, 'multiply')
+
     def __truediv__(self, other):
         '''
         Overloads the division operator such that it works for DiffObj objects.
@@ -329,10 +330,35 @@ class DiffObj(object):
         In other words, DiffObj.get_val(val_dict) returns the division of the operands after
         their values are evaluated individually with respect to their own value dictionaries.
 
-        
+        DOCTEST
+        ======
+        >>> z=x/y
+        >>> z.get_val({'x':3,'y':2})
+        1
+        >>> z.get_der({'x':3,'y':2})
+        {'y': -1, 'x': 0}
+        >>> 
+
 
         '''
         return self.getBinaryOperator(other, 'divide')
+    def __div__(self,other):
+        return self.__truediv__(other)
+        '''
+        __div__ for python2 support
+
+
+        DOCTEST
+        ======
+        >>> z=x/y
+        >>> z.get_val({'x':3,'y':2})
+        1
+        >>> z.get_der({'x':3,'y':2})
+        {'y': -1, 'x': 0}
+        >>> 
+
+        '''
+
     def __pow__(self, other):
         '''
         Overloads the power operator such that it works for DiffObj objects.
