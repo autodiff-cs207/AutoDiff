@@ -389,10 +389,27 @@ class DiffObj(object):
     __radd__ = __add__
     __rsub__ = __sub__
     __rmul__ = __mul__
+    __rpow__ = __pow__
     __rtruediv__ = __truediv__
     
    
 class Variable(DiffObj):
+    '''
+    All variables inside a function whose derivative and value a user wants to calculate, 
+    will be instances of the Variable class, which inherits from DiffObj and implements
+    get_val and get_der
+
+    CLASS ATTRIBUTES
+    ================
+    var_name:           A string, which is unique to this Variable instance.
+                        E.g. x = Variable('x')
+
+    CLASS FUNCTIONS
+    ===============
+    This implements get_val and get_der, a description of which is provided in the 
+    Super-class DiffObj.
+
+    '''
     def __init__(self, var_name):
         self.var_name = var_name
         super(Variable, self).__init__([var_name], None, None)
@@ -416,6 +433,24 @@ class Variable(DiffObj):
             return der_dict
 
 class Constant(DiffObj):
+    '''
+    All constants inside a function whose derivative and value a user wants to calculate,
+    will be instances of the Constant class, which inherits from DiffObj and implements
+    get_val and get_der
+
+    CLASS ATTRIBUTES
+    ================
+    const_name:         A string, which is unique to this Constant instance.
+    const_val:          An int or float number, which will be the value assigned to this instance.
+
+                        E.g. c = Constant('c', 10.0)
+
+    CLASS FUNCTIONS
+    ===============
+    This implements get_val and get_der, a description of which is provided in the
+    Super-class DiffObj. As expected, get_val simply returns self.const_val while
+    get_der will return 0.
+    '''
     def __init__(self, const_name, const_val):
         super(Constant, self).__init__([], None, None)
         self.const_name = const_name

@@ -239,6 +239,22 @@ class TestAutoDiff():
 			f2 = mo.log(a)
 			f2.get_der(val_dict)['a']
 
+	def test_exp(self):
+		val_dict = {'x' : 10, 'y' : 5}
+		x = Variable('x')
+		y = Variable('y')
+		c1 = Constant('c1',2.0)	
+		c2 = Constant('c2', 0.0)
+
+		f0 = mo.exp(x)
+		assert(f0.get_val(val_dict) == math.exp(10))
+		assert(f0.get_der(val_dict)['x'] == math.exp(10))
+
+		f1 = c1*f0
+
+		assert(f1.get_val(val_dict)==2.0*math.exp(10))
+		assert(f1.get_der(val_dict)['x'] == 2.0*math.exp(10))
+
 
 	def test_exceptions(self):
 		val_dict = {'x' : 10, 'y' : 5}
