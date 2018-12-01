@@ -138,7 +138,10 @@ class DiffObj(object):
             func_val = op1_val**op2_val
             for w in with_respect_to:
                 try:
-                    dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w] + 
+                    if op2.get_der(value_dict, [w])[w] == 0:
+                         dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w])
+                    else:
+                        dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w] + 
                             math.log(op1_val)*op2.get_der(value_dict, [w])[w])
                 except:
                     raise ValueError('Derivative is only defined for positive Base in an Exponentiation.')

@@ -1,11 +1,36 @@
 import api
 
-def single_function_root_finder(input_function, lr=0.01, adadelta=False):
+def single_function_root_finder(input_function,tolerance):
 	# When value of function < 0 then optimize the function towards > 0 and vise versa
 	# ends until the value of the function becomes stable
-	# when adadelta is set Ture, change lr (learning rate) according to a set of rules that you define
-	# root finding process should include random initializing params and vairables in order to find all roots
-	pass
+	# when adadelta is set to True, change lr (learning rate) according to a set of rules that you define
+	# root finding process should include random initializing params and variables in order to find all roots
+
+	def find_root(f,starting_val, max_iter,tol):
+		val_dict = {'x' : starting_val}
+		error_list = []
+		fx = f.get_val(val_dict)
+		i = 0
+		while i < max_iter and abs(fx) > tol:
+			i+=1
+			error_list += [fx]
+			dx = f.get_der(val_dict)['x']
+			try:
+				val_dict['x'] = val_dict['x'] - fx/dx
+				new_fx = f.get_val(val_dict)
+				fx = new_fx
+			except ZeroDivisionError:
+				print("Tried to divide by zero!")
+		return (val_dict['x'], f.get_val(val_dict), i,error_list)
+
+	f = input_function
+	
+	starting_val_list = [5]
+	num_starting_values = len(starting_val_list)
+	max_iter = 10000
+
+	return find_root(f,starting_val_list[0],max_iter,tolerance)
+
 
 
 def multiple_function_root_finder(input_function, lr=0.01, adadelta=False):
