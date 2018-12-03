@@ -63,22 +63,38 @@ class DiffObj(object):
         '''
         if self.operator not in DiffObj.OVERLOADED_OPERATORS:
             raise ValueError('{} is not a supported operator'.format(self.operator))
+        try:
+            op1_val = self.operand_list[0].get_val(value_dict)
+        except AttributeError:
+            op1_val = self.operand_list[0]
+        
+        try:
+            op2_val = self.operand_list[1].get_val(value_dict)
+        except AttributeError:
+            op2_val = self.operand_list[1]
+        
         if self.operator == 'add':
-            return self.operand_list[0].get_val(value_dict) + self.operand_list[1].get_val(value_dict)
+            return op1_val + op2_val
         elif self.operator == 'subtract':
-            return self.operand_list[0].get_val(value_dict) - self.operand_list[1].get_val(value_dict)
+            return op1_val - op2_val
         elif self.operator == 'multiply':
-            return self.operand_list[0].get_val(value_dict)*self.operand_list[1].get_val(value_dict)
+            return op1_val*op2_val
         elif self.operator == 'divide':
             try:
-                result = self.operand_list[0].get_val(value_dict)/self.operand_list[1].get_val(value_dict)
+                result = op1_val/op2_val
+                return result
+            except:
+                raise ValueError('Division by zeros is not allowed')
+        elif self.operator == 'rdivide':
+            try:
+                result = op2_val/op1_val
                 return result
             except:
                 raise ValueError('Division by zeros is not allowed')
         elif self.operator == 'power':
-            return self.operand_list[0].get_val(value_dict)**self.operand_list[1].get_val(value_dict)
+            return op1_val**op2_val
         elif self.operator == 'neg':
-            return -self.operand_list[0].get_val(value_dict)
+            return -op1_val
 
     def get_der(self, value_dict, with_respect_to=None):
         '''
@@ -111,20 +127,38 @@ class DiffObj(object):
         if not with_respect_to: with_respect_to = self.name_list
         df = {}
         op1, op2 = self.operand_list[0], self.operand_list[1]
-        op1_val = op1.get_val(value_dict)
-        op2_val = op2.get_val(value_dict)
+        try:
+            op1_val = op1.get_val(value_dict)
+        except AttributeError:
+            op1_val = op1
+        try:
+            op2_val = op2.get_val(value_dict)
+        except AttributeError:
+            op2_val = op2
 
         if self.operator == 'add':
             for w in with_respect_to:
-                dw = op1.get_der(value_dict, [w])[w] + op2.get_der(value_dict, [w])[w]
+                try:
+                    op2_der = op2.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op2_der = 0
+                dw = op1.get_der(value_dict, [w])[w] + op2_der
                 df[w] = dw
         elif self.operator == 'subtract':
             for w in with_respect_to:
-                dw = op1.get_der(value_dict, [w])[w] - op2.get_der(value_dict, [w])[w]
+                try:
+                    op2_der = op2.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op2_der = 0 
+                dw = op1.get_der(value_dict, [w])[w] - op2_der
                 df[w] = dw
         elif self.operator == 'multiply':
             for w in with_respect_to:
-                dw = op1.get_der(value_dict, [w])[w]*op2_val + op2.get_der(value_dict, [w])[w]*op1_val
+                try:
+                    op2_der = op2.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op2_der = 0  
+                dw = op1.get_der(value_dict, [w])[w]*op2_val + op2_der*op1_val
                 df[w] = dw
         elif self.operator == 'divide':
             try:
@@ -132,14 +166,38 @@ class DiffObj(object):
             except:
                 raise ValueError('Division by zero is not allowed')
             for w in with_respect_to:
-                dw = (op2_val*op1.get_der(value_dict, [w])[w] - op1_val*op2.get_der(value_dict, [w])[w])/(op2_val**2)
+                try:
+                    op2_der = op2.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op2_der = 0  
+                try:
+                    op1_der = op1.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op1_der = 0  
+                dw = (op2_val*op1_der - op1_val*op2_der)/(op2_val**2)
+                df[w] = dw
+        elif self.operator == 'rdivide':
+            try:
+                one_by_op1_val = 1.0/op1_val
+            except:
+                raise ValueError('Division by zero is not allowed')
+            for w in with_respect_to:
+                try:
+                    op2_der = op2.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op2_der = 0  
+                try:
+                    op1_der = op1.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op1_der = 0  
+                dw = (op1_val*op2_der - op2_val*op1_der)/(op1_val**2)
                 df[w] = dw
         elif self.operator == 'power':
             func_val = op1_val**op2_val
             for w in with_respect_to:
                 try:
                     if op2.get_der(value_dict, [w])[w] == 0:
-                         dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w])
+                        dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w])
                     else:
                         dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w] + 
                             math.log(op1_val)*op2.get_der(value_dict, [w])[w])
@@ -155,12 +213,18 @@ class DiffObj(object):
 
     def getBinaryOperator(self, other, operator_name):
         try:
+            this_name_list = self.name_list
+        except AttributeError:
+            this_name_list = []
+        try:
             other_name_list = other.name_list
-            if operator_name == 'neg': other_name_list = []
-            return DiffObj(self.name_list + other_name_list,
-                    operator_name, [self, other])
-        except:
-            raise TypeError('Operands need to be of type DiffObj.')
+        except AttributeError:
+            other_name_list = []
+        if operator_name == 'neg': other_name_list = []
+        return DiffObj(this_name_list + other_name_list,
+                operator_name, [self, other])
+        #except:
+        #    raise TypeError('Operands need to be of type DiffObj.')
 
     def __neg__(self):
         '''
@@ -267,6 +331,10 @@ class DiffObj(object):
 
         '''
         return self.getBinaryOperator(other, 'subtract')
+
+    def __rsub__(self, other):
+        return -self + other
+    
     def __mul__(self, other):
         '''
         Overloads the multiply operator such that it works for DiffObj objects.
@@ -345,6 +413,11 @@ class DiffObj(object):
 
         '''
         return self.getBinaryOperator(other, 'divide')
+
+    
+    def __rtruediv__(self, other): 
+        return self.getBinaryOperator(other, 'rdivide')
+
     def __div__(self,other):
         return self.__truediv__(other)
         '''
@@ -390,10 +463,8 @@ class DiffObj(object):
         '''
         return self.getBinaryOperator(other, 'power')
     __radd__ = __add__
-    __rsub__ = __sub__
     __rmul__ = __mul__
     __rpow__ = __pow__
-    __rtruediv__ = __truediv__
     
    
 class Variable(DiffObj):
