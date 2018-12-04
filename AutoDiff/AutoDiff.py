@@ -33,7 +33,7 @@ class DiffObj(object):
                         of DiffObj.
     '''
     OVERLOADED_OPERATORS = ['add', 'subtract', 'multiply', 'divide',
-            'power', 'neg']
+            'power', 'neg', 'rdivide', 'rpower']
     def __init__(self, name_list, operator, operand_list):
         self.name_list = name_list
         self.operator = operator
@@ -93,6 +93,8 @@ class DiffObj(object):
                 raise ValueError('Division by zeros is not allowed')
         elif self.operator == 'power':
             return op1_val**op2_val
+        elif self.operator == 'rpower':
+            return op2_val**op1_val
         elif self.operator == 'neg':
             return -op1_val
 
@@ -193,16 +195,44 @@ class DiffObj(object):
                 dw = (op1_val*op2_der - op2_val*op1_der)/(op1_val**2)
                 df[w] = dw
         elif self.operator == 'power':
-            func_val = op1_val**op2_val
             for w in with_respect_to:
                 try:
-                    if op2.get_der(value_dict, [w])[w] == 0:
-                        dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w])
+                    op2_der = op2.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op2_der = 0  
+                try:
+                    op1_der = op1.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op1_der = 0  
+                if op1_val < 0:
+                    if (op2_val/1.0).is_integer() and op2_der == 0:
+                        func_val = op1_val**op2_val
+                        dw = func_val*op2_val/op1_val*op1_der
                     else:
-                        dw = func_val*((op2_val/op1_val)*op1.get_der(value_dict, [w])[w] + 
-                            math.log(op1_val)*op2.get_der(value_dict, [w])[w])
-                except:
-                    raise ValueError('Derivative is only defined for positive Base in an Exponentiation.')
+                        raise ValueError('Base in Exponentiation should be positive.')
+                else:
+                    func_val = op1_val**op2_val
+                    dw = func_val*((op2_val/op1_val)*op1_der + math.log(op1_val)*op2_der)
+                df[w] = dw
+        elif self.operator == 'rpower':
+            for w in with_respect_to:
+                try:
+                    op2_der = op2.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op2_der = 0  
+                try:
+                    op1_der = op1.get_der(value_dict, [w])[w]
+                except AttributeError:
+                    op1_der = 0  
+                if op2_val < 0:
+                    if (op1_val/1.0).is_integer() and op1_der == 0:
+                        func_val = op2_val**op1_val
+                        dw = func_val*op1_val/op2_val*op2_der
+                    else:
+                        raise ValueError('Base in Exponentiation should be positive.')
+                else:
+                    func_val = op2_val**op1_val
+                    dw = func_val*((op1_val/op2_val)*op2_der + math.log(op2_val)*op1_der)
                 df[w] = dw
         elif self.operator == 'neg':
             for w in with_respect_to:
@@ -223,8 +253,6 @@ class DiffObj(object):
         if operator_name == 'neg': other_name_list = []
         return DiffObj(this_name_list + other_name_list,
                 operator_name, [self, other])
-        #except:
-        #    raise TypeError('Operands need to be of type DiffObj.')
 
     def __neg__(self):
         '''
@@ -462,9 +490,12 @@ class DiffObj(object):
         {'y': 3, 'x': 2}
         '''
         return self.getBinaryOperator(other, 'power')
+
+    def __rpow__(self, other):
+        return self.getBinaryOperator(other, 'rpower')
+
     __radd__ = __add__
     __rmul__ = __mul__
-    __rpow__ = __pow__
     
    
 class Variable(DiffObj):
