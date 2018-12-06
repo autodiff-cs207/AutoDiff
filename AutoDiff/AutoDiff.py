@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 class DiffObj(object):
     '''
@@ -570,6 +571,37 @@ class Constant(DiffObj):
         for w in with_respect_to:
             der_dict[w] = 0
         return der_dict
+
+
+class VectorFunction(DiffObj):
+    '''
+    Temporary vector function for use in root_finder.py until code supports vector valued functions
+    ''' 
+    def __init__(self, list_of_functions):
+        self.list_of_functions = list_of_functions
+        name_list = []
+        for f in self.list_of_functions:
+            name_list = name_list+f.name_list
+        name_list = list(set(name_list))
+        super(VectorFunction, self).__init__(name_list, None, None)
+
+
+    def get_val(self, val_dict):
+        return [f.get_val(val_dict) for f in self.list_of_functions]  
+    def get_der(self, val_dict, with_respect_to=None):
+        return [f.get_der(val_dict, with_respect_to) for f in self.list_of_functions] 
+
+    # returns 2d array from list of dictionarys
+    def dict_list_to_array(self,dict_list):
+        arr = []
+        for f_dict in dict_list:
+            row = []
+            for var in self.name_list:
+                row.append(f_dict[var])
+            arr.append(row)        
+        return arr
+
+
 
 class MathOps(DiffObj):
     '''

@@ -2,6 +2,8 @@ import api
 from threading import Thread
 import random
 import numpy as np
+import math
+
 
 # create a thread object that returns the thread results
 # adapted from kindall on stackoverflow
@@ -17,58 +19,81 @@ class ThreadWithReturnValue(Thread):
         Thread.join(self, *args)
         return self._return
 
-# one-dimensional Newton's method
-def newton(input_function,tolerance=1e-5, num_starting_vals = 20, 
-	starting_val_range = (-1000,1000), starting_val_list=[], verbose=True):
+# multi-dimensional Newton's method
+def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20, 
+	starting_val_range = (-1000,1000), starting_val_dict_list=None, verbose=True):
+
+	# initialize our list
+	if not starting_val_dict_list:
+		starting_val_dict_list = []
 
 	# find one root 
-	def find_root(f,starting_val, max_iter,tol):
-		val_dict = {'x' : starting_val}
+	def find_root(vf,starting_val_dict, max_iter,tol):
+		
+		val_dict = starting_val_dict
+
 		error_list = []
 		fx = f.get_val(val_dict)
 		i = 0
+		all_dim_dist = math.inf
 
 		# if we haven't done too many iterations and we're still greater than our tolerance 
-		while i < max_iter and abs(fx) > tol:
+		while i < max_iter and  all_dim_dist > tol:
 			i+=1
 
-			# make a list of errors so we can check Newton's method is working
-			error_list += [abs(fx)]
+			abs_fx = [abs(val) for val in fx]
+			all_dim_dist = np.sum(abs_fx)
+			all_dim_dist = np.linalg.norm(fx,ord=2)
 
-			# get derivative, move to new point
+			# make a list of errors so we can check Newton's method is working
+			error_list += [np.sum(abs_fx)]
+
+			# get jacobian, move to new point
 			try:
-				dx = f.get_der(val_dict)['x']
-				val_dict['x'] = val_dict['x'] - fx/dx
-				new_fx = f.get_val(val_dict)
+				dx = vf.dict_list_to_array(vf.get_der(val_dict))
+
+				# need to update all new values of value dictionary
+				delta = np.linalg.solve(np.array(dx),-1*np.array(fx))
+
+				# update dictionary
+				for i,val in enumerate(vf.name_list):
+					val_dict[val] = val_dict[val] + delta[i]
+				new_fx = vf.get_val(val_dict)
 				fx = new_fx
+
 			# avoid dividing by zero 
 			except:
 				print("Tried to divide by zero!")
 				return
-		return (val_dict['x'], f.get_val(val_dict), i,error_list)
+		return ([val_dict[var] for var in vf.name_list] , vf.get_val(val_dict), i,error_list)
 
 	# function takes value and list, returns true if value is within diff_tol of any value
 	# in the list, false otherwise.
-	def is_close_list(val, lst, diff_tol=1e-6):
+	def is_close_vector_lists(v,lst,diff_tol=1e-6):
 		for ele in lst:
-			if abs(val-ele) < diff_tol:
-				return True
-		return False 
+			l = [abs(v[i]-ele[i]) for i in range(len(v))]
+			if np.sum(l)<diff_tol:
+				return False
+		return True 
 
-	f = input_function	
+
+	f = input_function
 
 	# adjust starting value list to agree with number of requested starting values 
-	while len(starting_val_list)<num_starting_vals:
-		starting_val_list.append(random.randint(starting_val_range[0],starting_val_range[1]))
+	while len(starting_val_dict_list)<num_starting_vals:
+		starting_val_dict_to_add = {}
+		for var in f.name_list:
+			starting_val_dict_to_add[var] = random.randint(starting_val_range[0],starting_val_range[1])
+		starting_val_dict_list.append(starting_val_dict_to_add)
 
-	max_iter = 10000 #maybe user should be able to choose this? 
+	max_iter = 100 # maybe user should be able to choose this? 
 	results = []
 	roots = []
 
 	# start threads 
-	for i in range(len(starting_val_list)):
+	for i in range(len(starting_val_dict_list)):
 		thread = ThreadWithReturnValue(target=find_root, 
-			args=(f,starting_val_list[i],max_iter,tolerance))
+			args=(f,starting_val_dict_list[i],max_iter,tolerance))
 		thread.start()
 		full_result = thread.join()
 
@@ -77,7 +102,7 @@ def newton(input_function,tolerance=1e-5, num_starting_vals = 20,
 			root_result = full_result[0]
 
 			# check if root already in list 
-			if (not is_close_list(root_result, roots)):
+			if (is_close_vector_lists(root_result, roots)):
 				roots.append(root_result)
 				results.append(full_result)
 

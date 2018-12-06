@@ -11,7 +11,7 @@ class TestAutoDiff():
 		x = Variable('x')
 		y = Variable('y')
 		z = Variable('z')
-		c1 = Constant('c1', 5)
+		c1 = 5
 
 		f0 = x + y		     
 		assert(f0.get_val(val_dict) ==30)
@@ -262,13 +262,7 @@ class TestAutoDiff():
 		y = Variable('y')
 		c1 = Constant('c1',2.0)	
 		c2 = Constant('c2', 0.0)
-		
-		with pytest.raises(TypeError):
-			x+5
-		with pytest.raises(TypeError):
-			5+x 	
-		with pytest.raises(TypeError):
-			mo.log(5)
+			
 		with pytest.raises(ValueError):
 			f0 = x/c2
 			f0.get_val(val_dict)
