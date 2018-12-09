@@ -1,0 +1,5 @@
+**/.ipynb_checkpoints/
+**/__pycache__/
+AutoDiff.egg-info
+build
+dist

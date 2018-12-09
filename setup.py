@@ -6,5 +6,5 @@ setup(
    description='Autodifferentiation package',
    author='CS207 group 15',
    packages=['AutoDiff'],  #same as name
-   install_requires=[], #external packages as dependencies
+   install_requires=['numpy'], #external packages as dependencies
 )
