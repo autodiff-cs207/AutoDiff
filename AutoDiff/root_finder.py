@@ -1,4 +1,4 @@
-import api
+from AutoDiff import api
 from threading import Thread
 import random
 import numpy as np
@@ -97,7 +97,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 			args=(f,starting_val_dict_list[i],max_iter,tolerance))
 		thread.start()
 		threads.append(thread)
-	for in range(len(starting_val_dict_list)):
+	for i in range(len(starting_val_dict_list)):
 		full_result = threads[i].join()
 
 		# if didn't catch exception in find_root 
