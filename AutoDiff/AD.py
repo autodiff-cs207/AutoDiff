@@ -1005,6 +1005,74 @@ class MathOps(DiffObj):
         '''
         return MathOps.getUnaryOperator('arctan', obj)
 
+
+    @classmethod
+    def sinh(cls, obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the hyperbolic sine function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'hsin' and whose operand is
+                    the DiffObj on which the user had called this hyperbolic sin function.
+
+        DOCTEST
+        ======
+        >>> z=MathOps.hsin(x)
+        >>> z.get_val({'x':math.pi})
+        1.2246467991473532e-16
+        >>> z.get_der({'x':math.pi})
+        {'x': -1.0}
+        
+        '''
+        return MathOps.getUnaryOperator('sinh', obj)
+    @classmethod
+    def cosh(cls, obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the hyperbolic cos function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'hcos' and whose operand is
+                    the DiffObj on which the user had called this hyperbolic cos function.
+        DOCTEST
+        ======
+        
+        >>> z=MathOps.cos(x)
+        >>> z.get_val({'x':math.pi})
+        -1.0
+        >>> z.get_der({'x':math.pi})
+        {'x': -1.2246467991473532e-16}
+        '''
+        return MathOps.getUnaryOperator('cosh', obj)
+    @classmethod
+    def tanh(cls,obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the hyperbolic tan function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'tanh' and whose operand is
+                    the DiffObj on which the user had called this hyperbolic tan function.
+
+        DOCTEST
+        ======
+        
+        >>> z=MathOps.tanh(x)
+        >>> z.get_val({'x':0})
+        0.0
+        >>> z.get_der({'x':0})
+        {'x': 1.0}
+        '''
+
+        return MathOps.getUnaryOperator('tanh', obj)
+
     @classmethod
     def log(cls, obj):
         '''
@@ -1100,6 +1168,13 @@ class MathOps(DiffObj):
         elif self.operator == 'arctan':
             result = np.arctan(operand_val)
             return result
+        if self.operator == 'sinh':
+            return np.sinh(operand_val)
+        elif self.operator == 'cosh':
+            return np.cosh(operand_val)
+        elif self.operator == 'tanh':
+            result = np.tanh(operand_val)
+            return result
         elif self.operator == 'log':
             try:
                 result = math.log(operand_val)
@@ -1172,6 +1247,21 @@ class MathOps(DiffObj):
         elif self.operator == 'arctan':
             for w in with_respect_to:
                 dw = (1/(1 + op1.get_val(value_dict)**2))* op1.get_der(value_dict, [w])[w]
+                df[w] = dw
+
+        elif self.operator == 'sinh':
+            for w in with_respect_to:
+                dw = np.cosh(op1.get_val(value_dict))* op1.get_der(value_dict, [w])[w]
+                df[w] = dw
+
+        elif self.operator == 'cosh':
+            for w in with_respect_to:
+                dw = np.sinh(op1.get_val(value_dict))* op1.get_der(value_dict, [w])[w]
+                df[w] = dw
+
+        elif self.operator == 'tanh':
+            for w in with_respect_to:
+                dw = (1/(np.cosh(op1.get_val(value_dict))**2))* op1.get_der(value_dict, [w])[w]
                 df[w] = dw
 
         elif self.operator == 'log':
