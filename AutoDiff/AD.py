@@ -544,7 +544,6 @@ class DiffObj(object):
                         raise ValueError("Repeated key: ", item.var_name)
                     default_val_dict[item.var_name]=item.default_val
                 elif isinstance(item,DiffObj):# or str(type(item)) == "<class 'AutoDiff.DiffObj'>" or str(type(item)) == "<class 'AutoDiff.MathOps'>":
-                    assert(len(item.operand_list)>0)
                     for operand in item.operand_list:
                         next_tree.append(operand)
                 elif isinstance(item, int):
@@ -561,22 +560,22 @@ class DiffObj(object):
     EQUALITY OPERATOR BEHAVIOR
     ==========================
 
-    __eq__      Returns True if DiffObj have the same derivative and value at its respective default
+    __eq__      Returns True if DiffObj have the same derivative and value at their respective default
                 Variable values. Variables must also have the same names. False otherwise.
 
-    __ne__     Returns the boolean negation of __eq__.
+    __ne__      Returns the boolean negation of __eq__.
 
-    __gt__      Returns true if the left DiffObj value is greater than the right DiffObj value at its
+    __gt__      Returns true if the left DiffObj value is greater than the right DiffObj value at their
                 respective default Variable values. False otherwise. 
 
-    __lt__      Returns true if the left DiffObj value is less than the right DiffObj value at its
+    __lt__      Returns true if the left DiffObj value is less than the right DiffObj value at their
                 respective default Variable values. False otherwise. 
 
     __ge__      Returns true if the left DiffObj value is greater than or equal to the right DiffObj 
-                value at its respective default Variable values. False otherwise. 
+                value at their respective default Variable values. False otherwise. 
 
     __le__      Returns true if the left DiffObj value is less than or equal to the right DiffObj value 
-                at its respective default Variable values. False otherwise. 
+                at their respective default Variable values. False otherwise. 
 
     DOCTEST
     =======
@@ -832,7 +831,6 @@ class VectorFunction(DiffObj):
         return arr
 
 
-
 class MathOps(DiffObj):
     '''
     This class inherits from the DiffObj class. It implements non-elementary unary functions 
@@ -1065,6 +1063,96 @@ class MathOps(DiffObj):
 
         if len(df) == 0: df = {'' : 0}
         return df
+
+    '''
+    EQUALITY OPERATOR BEHAVIOR
+    ==========================
+
+    __eq__      Returns True if MathOps objects have the same derivative and value at their respective default
+                Variable values. Variables must also have the same names. False otherwise.
+
+    __ne__      Returns the boolean negation of __eq__.
+
+    __gt__      Returns true if the left MathOps object value is greater than the right MathOps object value at their
+                respective default Variable values. False otherwise. 
+
+    __lt__      Returns true if the left MathOps object value is less than the right MathOps object value at their
+                respective default Variable values. False otherwise. 
+
+    __ge__      Returns true if the left MathOps object value is greater than or equal to the right MathOps object 
+                value at their respective default Variable values. False otherwise. 
+
+    __le__      Returns true if the left MathOps object value is less than or equal to the right MathOps object value 
+                at their respective default Variable values. False otherwise. 
+
+    DOCTEST
+    =======
+    
+    >>> x = Variable('x',MathOps.pi)
+    >>> y = Variable('y',MathOps.pi)
+    >>> z = Variable('z',1)
+    >>> f = sin(x)
+    >>> g = sin(y)
+    >>> h = sin(z)
+    >>> j = sin(x)
+    >>> f == g
+    False
+    >>> f == h
+    False
+    >>> f == j
+    True
+    >>> f > g
+    False
+    >>> f < h
+    True 
+    >>> f >= g
+    True
+    >>> f <= j
+    True 
+    '''
+    def __eq__(self,other):
+        if not (type(self)==type(other)):
+            return False 
+        dict_val_self = self.get_dict_val()
+        dict_val_other = other.get_dict_val()
+        return (self.get_val(dict_val_self) == other.get_val(dict_val_other) and 
+            self.get_der(dict_val_self) == other.get_der(dict_val_other))
+
+    def __ne__(self,other):
+        return not self.__eq__(other)
+
+    def __gt__(self,other):
+        if (type(self)==type(other)):
+            dict_val_self = self.get_dict_val()
+            dict_val_other = other.get_dict_val()
+            return (self.get_val(dict_val_self) > other.get_val(dict_val_other))
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __lt__(self,other):
+        if (type(self)==type(other)):
+            dict_val_self = self.get_dict_val()
+            dict_val_other = other.get_dict_val()
+            return (self.get_val(dict_val_self) < other.get_val(dict_val_other))
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __ge__(self,other):
+        if (type(self)==type(other)):
+            dict_val_self = self.get_dict_val()
+            dict_val_other = other.get_dict_val()
+            return (self.get_val(dict_val_self) >= other.get_val(dict_val_other))
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __le__(self,other):
+        if (type(self)==type(other)):
+            dict_val_self = self.get_dict_val()
+            dict_val_other = other.get_dict_val()
+            return (self.get_val(dict_val_self) <= other.get_val(dict_val_other))
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
 
 if __name__ == "__main__":
     import doctest
