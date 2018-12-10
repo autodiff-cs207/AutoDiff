@@ -1,10 +1,11 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
-   name='AutoDiff',
+   name='AutoDiff_207_15',
    version='0.1',
    description='Autodifferentiation package',
    author='CS207 group 15',
-   packages=['AutoDiff'],  #same as name
+   packages=find_packages(),  #same as name
    install_requires=['numpy'], #external packages as dependencies
+   data_files = [("", ["LICENSE"])],
 )
