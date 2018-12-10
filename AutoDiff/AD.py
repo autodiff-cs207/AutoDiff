@@ -35,7 +35,7 @@ class DiffObj(object):
     '''
     OVERLOADED_OPERATORS = ['add', 'subtract', 'multiply', 'divide',
             'power', 'neg', 'rdivide', 'rpower']
-    def __init__(self, name_list, operator, operand_list):
+    def __init__(self, name_list, operator, operand_list, default_val=None):
         self.name_list = name_list
         self.operator = operator
         self.operand_list = operand_list
@@ -497,6 +497,77 @@ class DiffObj(object):
 
     __radd__ = __add__
     __rmul__ = __mul__
+
+    def get_dict_val(self):
+        '''
+        Returns the default value dictionary. Used to determine equality between DiffObj objects that have
+        default variable values specified.  
+
+        INPUT
+        =====
+        self:        Takes a AutoDiff object of type AutoDiff.DiffObj.
+
+        Example Usage:
+        Will be called only in (in)equality tests. For example, if a and b are AutoDiff.DiffObj 
+        objects, a==b will call a.__eq__(b), which in turn will call a.get_dict_val() and b.get_dict_val().
+        The derivative and value of a and b with then be calculated at their default variable values.
+
+
+        OUTPUT
+        ======
+        result:             A dictionary, where each key is a value in name_list, and each value is the default
+                            value that was supplied by the user.
+
+
+        DOCTEST
+        ======
+        >>> x = Variable('x',5)
+        >>> y = Variable('y',2)
+        >>> f = x+y
+        >>> f.get_dict_val()
+        {'x': 5, 'y': 2}
+        '''
+        default_val_dict = {}
+        val_list = self.name_list
+        tree = self.operand_list
+        current_tree = tree
+        next_tree = []
+        while True:
+            if len(current_tree) == 0:
+                return default_val_dict
+            for item in current_tree:
+
+                if isinstance(item,Variable):# or str(type(item)) == "<class 'AutoDiff.Variable'>":
+
+                    # each variable should have only one default value
+                    if item.var_name in default_val_dict:
+                        raise ValueError("Repeated key: ", item.var_name)
+                    default_val_dict[item.var_name]=item.default_val
+                elif isinstance(item,DiffObj):# or str(type(item)) == "<class 'AutoDiff.DiffObj'>" or str(type(item)) == "<class 'AutoDiff.MathOps'>":
+                    assert(len(item.operand_list)>0)
+                    for operand in item.operand_list:
+                        next_tree.append(operand)
+                elif isinstance(item, int):
+                    pass
+                else:
+                    raise ValueError("Unexpected type: " + str(type(item)))
+
+            current_tree = next_tree
+            next_tree = []
+        raise ValueError("Impossible")
+
+    # equality returns true only if DiffObj objects share same derivative and value and the specified
+    # default variable values, and the variable names are the same.
+    def __eq__(self,other):
+        if not (type(self)==type(other)):
+            return False 
+        dict_val_self = self.get_dict_val()
+        dict_val_other = other.get_dict_val()
+        return (self.get_val(dict_val_self) == other.get_val(dict_val_other) and 
+            self.get_der(dict_val_self) == other.get_der(dict_val_other))
+
+    def __ne__(self,other):
+        return not self.__eq__(other)
     
    
 class Variable(DiffObj):
@@ -516,9 +587,10 @@ class Variable(DiffObj):
     Super-class DiffObj.
 
     '''
-    def __init__(self, var_name):
+    def __init__(self, var_name, default_val=None):
         self.var_name = var_name
-        super(Variable, self).__init__([var_name], None, None)
+        self.default_val = default_val
+        super(Variable, self).__init__([var_name], None, {var_name: default_val})
     
     def get_val(self, value_dict):
         if self.var_name not in value_dict:
@@ -537,6 +609,13 @@ class Variable(DiffObj):
             for w in with_respect_to:
                 der_dict[w] = int(w == self.var_name)
             return der_dict
+
+    def __eq__(self,other):
+        return (self.default_val == other.default_val and
+            self.var_name == other.var_name)
+
+    def __ne__(self,other):
+        return not self.__eq__(other)
 
 class Constant(DiffObj):
     '''
