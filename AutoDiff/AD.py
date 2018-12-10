@@ -556,8 +556,55 @@ class DiffObj(object):
             next_tree = []
         raise ValueError("Impossible")
 
-    # equality returns true only if DiffObj objects share same derivative and value and the specified
-    # default variable values, and the variable names are the same.
+
+    '''
+    EQUALITY OPERATOR BEHAVIOR
+    ==========================
+
+    __eq__      Returns True if DiffObj have the same derivative and value at its respective default
+                Variable values. Variables must also have the same names. False otherwise.
+
+    __ne__     Returns the boolean negation of __eq__.
+
+    __gt__      Returns true if the left DiffObj value is greater than the right DiffObj value at its
+                respective default Variable values. False otherwise. 
+
+    __lt__      Returns true if the left DiffObj value is less than the right DiffObj value at its
+                respective default Variable values. False otherwise. 
+
+    __ge__      Returns true if the left DiffObj value is greater than or equal to the right DiffObj 
+                value at its respective default Variable values. False otherwise. 
+
+    __le__      Returns true if the left DiffObj value is less than or equal to the right DiffObj value 
+                at its respective default Variable values. False otherwise. 
+
+    DOCTEST
+    =======
+    >>> x = Variable('x',5)
+    >>> y = Variable('y',3)
+    >>> z = Variable('z',5)
+    >>> f = 4*x
+    >>> g = 8*y
+    >>> h = 4*x
+    >>> j = 4*z
+    >>> f == g
+    False
+    >>> f == h
+    True
+    >>> f == j
+    False
+    >>> f == x
+    False
+    >>> f > g
+    False
+    >>> f < g
+    True
+    >>> h <= f
+    True
+    >>> g >= h
+    True
+
+    '''
     def __eq__(self,other):
         if not (type(self)==type(other)):
             return False 
@@ -568,7 +615,40 @@ class DiffObj(object):
 
     def __ne__(self,other):
         return not self.__eq__(other)
-    
+
+    def __gt__(self,other):
+        if (type(self)==type(other)):
+            dict_val_self = self.get_dict_val()
+            dict_val_other = other.get_dict_val()
+            return (self.get_val(dict_val_self) > other.get_val(dict_val_other))
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __lt__(self,other):
+        if (type(self)==type(other)):
+            dict_val_self = self.get_dict_val()
+            dict_val_other = other.get_dict_val()
+            return (self.get_val(dict_val_self) < other.get_val(dict_val_other))
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __ge__(self,other):
+        if (type(self)==type(other)):
+            dict_val_self = self.get_dict_val()
+            dict_val_other = other.get_dict_val()
+            return (self.get_val(dict_val_self) >= other.get_val(dict_val_other))
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __le__(self,other):
+        if (type(self)==type(other)):
+            dict_val_self = self.get_dict_val()
+            dict_val_other = other.get_dict_val()
+            return (self.get_val(dict_val_self) <= other.get_val(dict_val_other))
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+
    
 class Variable(DiffObj):
     '''
@@ -610,12 +690,83 @@ class Variable(DiffObj):
                 der_dict[w] = int(w == self.var_name)
             return der_dict
 
+
+    '''
+    EQUALITY OPERATOR BEHAVIOR
+    ==========================
+
+    __eq__      Returns True if Variables have the same default values and variable names. 
+                False otherwise.
+
+    __ne__      Returns the boolean negation of __eq__.
+
+    __gt__      Returns true if the left Variable default value is greater than the right Variable 
+                default value. False otherwise. 
+
+    __lt__      Returns true if the left Variable default value is less than the right Variable 
+                default value. False otherwise. 
+
+    __ge__      Returns true if the left Variable default value is greater than or equal to the 
+                right Variable default value. False otherwise. 
+
+    __le__      Returns true if the left Variable default value is less than or equal to the 
+                right Variable default value. False otherwise. 
+
+    DOCTEST
+    =======
+    >>> w = Variable('x',5)
+    >>> x = Variable('x',5)
+    >>> y = Variable('y',3)
+    >>> z = Variable('z',5)
+    >>> w == x
+    True
+    >>> x == z
+    False
+    >>> x == y
+    False
+    >>> x > y
+    True
+    >>> x < w
+    False
+    >>> x <= z
+    True
+    >>> x >= y
+    True
+
+    '''
+
     def __eq__(self,other):
+        if not (type(self)==type(other)):
+            return False 
         return (self.default_val == other.default_val and
             self.var_name == other.var_name)
 
     def __ne__(self,other):
         return not self.__eq__(other)
+
+    def __le__(self,other):
+        if (type(self)==type(other)):
+            return self.default_val <= other.default_val
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __ge__(self,other):
+        if (type(self)==type(other)):
+            return self.default_val >= other.default_val
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __lt__(self,other):
+        if (type(self)==type(other)):
+            return self.default_val < other.default_val
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __gt__(self,other):
+        if (type(self)==type(other)):
+            return self.default_val > other.default_val
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
 
 class Constant(DiffObj):
     '''
