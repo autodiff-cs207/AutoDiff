@@ -1,10 +1,12 @@
 import pytest 
 import math
+import numpy as np
 from AutoDiff import DiffObj, Variable, Constant, VectorFunction
 from AutoDiff import MathOps as mo
 from AutoDiff.root_finder import ThreadWithReturnValue, vectorNewton
 
-# @pytest.markfilterwarnings()
+TOL = 1e-6
+
 class TestRootFinder():
     def test_no_roots(self):        
         c5 = Constant('c5', 5)
@@ -19,30 +21,45 @@ class TestRootFinder():
         x_sq_c5 = x_sq + c5
         x_sq_c5_v = VectorFunction([x_sq_c5])
 
-        vector_list = [c5_v, sin_x_c5_v] #, x_sq_c5_v]
+        vector_list = [c5_v, sin_x_c5_v, x_sq_c5_v]
 
-        for vector in vector_list:
+        for i in range(len(vector_list)):
+            vector = vector_list[i]
+            print(i)
             roots = vectorNewton(vector, verbose=False)
             assert len(roots) == 0
 
+    def test_single_root(self):
+        c3 = Constant('c3', 3)
+        x = Variable('x')
 
-    # def test_single_root(self):
-        
+        x_cubed = x ** c3
+        x_cubed_roots = vectorNewton(VectorFunction([x_cubed]), verbose=False, tolerance=TOL**4)
+        print(x_cubed_roots)
+        assert len(x_cubed_roots) == 1
+        assert len(x_cubed_roots[0]) == 1
+        assert abs(x_cubed_roots[0][0] ** 3) < TOL
 
-    # def test_multiple_roots(self):
-    #     pass
+        x3 = c3 * x
+        x3_roots = vectorNewton(VectorFunction([x3]), verbose=False)
+        assert len(x3_roots) == 1
+        assert len(x3_roots[0]) == 1
+        assert abs(3 * x3_roots[0][0]) < TOL
 
+        x9 = c3 * c3 * x
+        x9_roots = vectorNewton(VectorFunction([x9]), verbose=False)
+        assert len(x9_roots) == 1
+        assert len(x9_roots[0]) == 1
+        assert abs(9 * x9_roots[0][0]) < TOL
 
-
-# const5 = Constant('const5', 5)
-# const3 = Constant('const3', 3)
-# x = Variable('x')
-# f_x =  const5 * x + const3
-# vf_x = VectorFunction([f_x])
-
-# tol = 1e-6
-# roots = vectorNewton(vf_x, verbose=False)
-# print(roots)
-# assert abs(roots[0][0] - (-0.6)) < tol, "Root found was incorrect"
-
+    def test_multiple_roots(self):
+        x = Variable('x')
+        c1 = Constant('c1', 1)
+        c2 = Constant('c2', 2)
+        c3 = Constant('c3', 5)
+        c4 = Constant('c4', 10)
+        f = c3**(c1 + mo.sin(mo.log(c3 + x**c2))) - c4
+        roots = vectorNewton(VectorFunction([f]), verbose=False)
+        for root in roots:
+            assert abs(5**(1+ np.sin(np.log(5 + root[0]**2))) - 10) < TOL
 
