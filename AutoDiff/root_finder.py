@@ -37,7 +37,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 
 		error_list = []
 		fx = f.get_val(val_dict)
-		i = 0
+		it = 0
 		all_dim_dist = math.inf
 
 		# if we haven't done too many iterations and we're still greater than our tolerance 
@@ -59,7 +59,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 				delta = np.linalg.solve(np.array(dx),-1*np.array(fx))
 
 				# update dictionary
-				for i, val in enumerate(vf.name_list):
+				for i,val in enumerate(vf.name_list):
 					val_dict[val] = val_dict[val] + delta[i]
 				new_fx = vf.get_val(val_dict)
 				fx = new_fx
@@ -68,7 +68,8 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 			except:
 				logger.warning("Tried to divide by zero!")
 				return
-		return ([val_dict[var] for var in vf.name_list] , vf.get_val(val_dict), i,error_list)
+
+		return ([val_dict[var] for var in vf.name_list], vf.get_val(val_dict), i, error_list)
 
 	# function takes value and list, returns true if value is within diff_tol of any value
 	# in the list, false otherwise.
@@ -76,8 +77,8 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		for ele in lst:
 			l = [abs(v[i]-ele[i]) for i in range(len(v))]
 			if np.sum(l)<diff_tol:
-				return False
-		return True 
+				return True
+		return False
 
 
 	f = input_function
@@ -107,8 +108,13 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		if full_result:
 			root_result = full_result[0]
 
+			is_zero = True
+			for output in full_result[1]:
+				if abs(output) > tolerance:
+					is_zero = False
+
 			# check if root already in list 
-			if (is_close_vector_lists(root_result, roots)):
+			if not (is_close_vector_lists(root_result, roots)) and is_zero:
 				roots.append(root_result)
 				results.append(full_result)
 
