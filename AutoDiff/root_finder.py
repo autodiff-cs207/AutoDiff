@@ -91,11 +91,14 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 	roots = []
 
 	# start threads 
+	threads = []
 	for i in range(len(starting_val_dict_list)):
 		thread = ThreadWithReturnValue(target=find_root, 
 			args=(f,starting_val_dict_list[i],max_iter,tolerance))
 		thread.start()
-		full_result = thread.join()
+		threads.append(thread)
+	for in range(len(starting_val_dict_list)):
+		full_result = threads[i].join()
 
 		# if didn't catch exception in find_root 
 		if full_result:
