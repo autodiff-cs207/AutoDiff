@@ -934,6 +934,77 @@ class MathOps(DiffObj):
         '''
 
         return MathOps.getUnaryOperator('tan', obj)
+
+    @classmethod
+    def arcsin(cls,obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the arcsin function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'arcsin' and whose operand is
+                    the DiffObj on which the user had called this arcsin function.
+
+        DOCTEST
+        ======
+        
+        >>> z=MathOps.arcsin(x)
+        >>> z.get_val({'x':0})
+        0.0
+        >>> z.get_der({'x':0})
+        {'x': 1.0}
+        '''
+        return MathOps.getUnaryOperator('arcsin', obj)
+
+    @classmethod
+    def arccos(cls,obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the arccos function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'arccos' and whose operand is
+                    the DiffObj on which the user had called this arccos function.
+
+        DOCTEST
+        ======
+        
+        >>> z=MathOps.arccos(x)
+        >>> z.get_val({'x':0})
+        math.pi/2
+        >>> z.get_der({'x':0})
+        {'x': -1.0}
+        '''
+        return MathOps.getUnaryOperator('arccos', obj)
+
+
+    @classmethod
+    def arctan(cls,obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the arctan function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'arctan' and whose operand is
+                    the DiffObj on which the user had called this arctan function.
+
+        DOCTEST
+        ======
+        
+        >>> z=MathOps.arctan(x)
+        >>> z.get_val({'x':0.0})
+        0.0
+        >>> z.get_der({'x':0.0})
+        {'x': 1.0}
+        '''
+        return MathOps.getUnaryOperator('arctan', obj)
+
     @classmethod
     def log(cls, obj):
         '''
@@ -1020,6 +1091,15 @@ class MathOps(DiffObj):
         elif self.operator == 'tan':
             result = math.tan(operand_val)
             return result
+        elif self.operator == 'arcsin':
+            result = np.arcsin(operand_val)
+            return result
+        elif self.operator == 'arccos':
+            result = np.arccos(operand_val)
+            return result
+        elif self.operator == 'arctan':
+            result = np.arctan(operand_val)
+            return result
         elif self.operator == 'log':
             try:
                 result = math.log(operand_val)
@@ -1074,6 +1154,26 @@ class MathOps(DiffObj):
             for w in with_respect_to:
                 dw = (sec_x**2)*op1.get_der(value_dict, [w])[w]
                 df[w] = dw
+
+        elif self.operator == 'arcsin':
+            for w in with_respect_to:
+                try:
+                    dw = (1/math.sqrt(1 - op1.get_val(value_dict)**2))* op1.get_der(value_dict, [w])[w]
+                    df[w] = dw
+                except:
+                    raise ValueError('arcsin cannot be evaluated at 1,-1.')
+        elif self.operator == 'arccos':
+            for w in with_respect_to:
+                try:
+                    dw = -(1/math.sqrt(1 - op1.get_val(value_dict)**2))* op1.get_der(value_dict, [w])[w]
+                    df[w] = dw
+                except:
+                    raise ValueError('arccos cannot be evaluated at 1,-1.')
+        elif self.operator == 'arctan':
+            for w in with_respect_to:
+                dw = (1/(1 + op1.get_val(value_dict)**2))* op1.get_der(value_dict, [w])[w]
+                df[w] = dw
+
         elif self.operator == 'log':
             try:
                 one_by_var = 1.0/op1.get_val(value_dict)
@@ -1091,7 +1191,7 @@ class MathOps(DiffObj):
             func_val = math.sqrt(op1.get_val(value_dict))
             for w in with_respect_to:
                 try:
-                    dw = (1/2.0)* (op1.get_val(value_dict)*(op1.get_der(value_dict, [w])[w]))**(-1/2.0)
+                    dw = ((1/2.0)* (op1.get_val(value_dict)**(-1/2.0))*(op1.get_der(value_dict, [w])[w]))
                     df[w] = dw
                 except:
                     raise ValueError('Square root cannot be evaluated on negative numbers.')
