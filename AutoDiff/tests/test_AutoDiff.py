@@ -11,7 +11,7 @@ class TestAutoDiff():
 		x = Variable('x')
 		y = Variable('y')
 		z = Variable('z')
-		c1 = 5
+		c1 = Constant('c1', 5)
 
 		f0 = x + y		     
 		assert(f0.get_val(val_dict) ==30)
@@ -270,7 +270,7 @@ class TestAutoDiff():
 			f0.get_der(val_dict)['p']
 		with pytest.raises(ValueError):
 			f0.get_val({'p':5})
-		with pytest.raises(ValueError):
+		with pytest.raises(TypeError):
 			f0.get_val({'x':'hello'})
 
 
@@ -297,7 +297,7 @@ class TestAutoDiff():
 		c1 = Constant('c1',1/3)
 
 		f0 = x**c1
-		with pytest.raises(ValueError):
+		with pytest.raises(ZeroDivisionError):
 			f0.get_der(val_dict)['x']
 
 
