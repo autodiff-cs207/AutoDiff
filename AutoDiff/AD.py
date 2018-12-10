@@ -920,7 +920,7 @@ class MathOps(DiffObj):
                     apply the tan function.
         OUTPUT
         ======
-        result:     A DiffObj, whose operator is 'sin' and whose operand is
+        result:     A DiffObj, whose operator is 'tan' and whose operand is
                     the DiffObj on which the user had called this tan function.
 
         DOCTEST
@@ -943,7 +943,7 @@ class MathOps(DiffObj):
                     apply the natural log function.
         OUTPUT
         ======
-        result:     A DiffObj, whose operator is 'sin' and whose operand is
+        result:     A DiffObj, whose operator is 'log' and whose operand is
                     the DiffObj on which the user had called this log function.
 
         DOCTEST
@@ -965,7 +965,7 @@ class MathOps(DiffObj):
                     apply the natural exponentiation function.
         OUTPUT
         ======
-        result:     A DiffObj, whose operator is 'sin' and whose operand is
+        result:     A DiffObj, whose operator is 'exp' and whose operand is
                     the DiffObj on which the user had called this exp function.
         >>> z=MathOps.exp(x)
         >>> z.get_val({'x':0})
@@ -975,6 +975,27 @@ class MathOps(DiffObj):
         '''
 
         return MathOps.getUnaryOperator('exp', obj)
+
+
+    @classmethod
+    def sqrt(cls, obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the natural exponentiation function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'sqrt' and whose operand is
+                    the DiffObj on which the user had called this exp function.
+        >>> z=MathOps.sqrt(x)
+        >>> z.get_val({'x':4})
+        2.0
+        >>> z.get_der({'x':4})
+        {'x': 8.0}
+        '''
+
+        return MathOps.getUnaryOperator('sqrt', obj)
     def get_val(self, value_dict):
         '''
         INPUT
@@ -1008,6 +1029,12 @@ class MathOps(DiffObj):
         elif self.operator == 'exp':
             result = math.exp(operand_val)
             return result
+        elif self.operator == 'sqrt':  
+            try:
+                result = math.sqrt(operand_val)
+                return result
+            except:
+                raise ValueError('Only positive values are permitted with square root.')
 
     def get_der(self, value_dict, with_respect_to=None):
         '''
@@ -1060,7 +1087,14 @@ class MathOps(DiffObj):
             for w in with_respect_to:
                 dw = func_val*op1.get_der(value_dict, [w])[w]
                 df[w] = dw
-
+        elif self.operator == 'sqrt':
+            func_val = math.sqrt(op1.get_val(value_dict))
+            for w in with_respect_to:
+                try:
+                    dw = (1/2.0)* (op1.get_val(value_dict)*(op1.get_der(value_dict, [w])[w]))**(-1/2.0)
+                    df[w] = dw
+                except:
+                    raise ValueError('Square root cannot be evaluated on negative numbers.')
         if len(df) == 0: df = {'' : 0}
         return df
 
