@@ -41,8 +41,8 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		all_dim_dist = math.inf
 
 		# if we haven't done too many iterations and we're still greater than our tolerance 
-		while i < max_iter and  all_dim_dist > tol:
-			i+=1
+		while it < max_iter and all_dim_dist > tol:
+			it += 1
 
 			abs_fx = [abs(val) for val in fx]
 			all_dim_dist = np.sum(abs_fx)
@@ -59,14 +59,14 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 				delta = np.linalg.solve(np.array(dx),-1*np.array(fx))
 
 				# update dictionary
-				for i,val in enumerate(vf.name_list):
+				for i, val in enumerate(vf.name_list):
 					val_dict[val] = val_dict[val] + delta[i]
 				new_fx = vf.get_val(val_dict)
 				fx = new_fx
 
 			# avoid dividing by zero 
 			except:
-				logger.warn("Tried to divide by zero!")
+				logger.warning("Tried to divide by zero!")
 				return
 		return ([val_dict[var] for var in vf.name_list] , vf.get_val(val_dict), i,error_list)
 
