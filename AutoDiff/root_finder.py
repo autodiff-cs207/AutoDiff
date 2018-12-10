@@ -3,6 +3,7 @@ from threading import Thread
 import random
 import numpy as np
 import math
+import logging
 
 
 # create a thread object that returns the thread results
@@ -22,6 +23,8 @@ class ThreadWithReturnValue(Thread):
 # multi-dimensional Newton's method
 def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20, 
 	starting_val_range = (-1000,1000), starting_val_dict_list=None, verbose=True):
+
+	logger = logging.getLogger()
 
 	# initialize our list
 	if not starting_val_dict_list:
@@ -63,7 +66,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 
 			# avoid dividing by zero 
 			except:
-				print("Tried to divide by zero!")
+				logger.warn("Tried to divide by zero!")
 				return
 		return ([val_dict[var] for var in vf.name_list] , vf.get_val(val_dict), i,error_list)
 
