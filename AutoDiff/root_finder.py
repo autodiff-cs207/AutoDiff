@@ -1,4 +1,4 @@
-from AutoDiff import api
+import AutoDiff
 from threading import Thread
 import random
 import numpy as np
