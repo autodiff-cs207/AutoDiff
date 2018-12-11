@@ -1,4 +1,4 @@
-import AutoDiff.AD as ad
+import AD as ad
 from threading import Thread
 import random
 import numpy as np
@@ -72,7 +72,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 				logger.warning("Tried to divide by zero!")
 				return
 
-		return ([val_dict[var] for var in vf.name_list], vf.get_val(val_dict), i, error_list)
+		return ([val_dict[var] for var in vf.name_list], vf.get_val(val_dict), len(error_list), error_list)
 
 	# function takes value and list, returns true if value is within diff_tol of any value
 	# in the list, false otherwise.
