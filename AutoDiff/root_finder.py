@@ -44,7 +44,10 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		while it < max_iter and all_dim_dist > tol:
 			it += 1
 
-			abs_fx = [abs(val) for val in fx]
+			try:
+				abs_fx = abs(fx)
+			except:
+				abs_fx = [abs(val) for val in fx]
 			all_dim_dist = np.sum(abs_fx)
 			all_dim_dist = np.linalg.norm(fx,ord=2)
 
@@ -123,11 +126,3 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		return results
 	else:
 		return roots
-
-
-def quasi_newton(input_function,tolerance):
-	pass
-
-
-def multiple_function_root_finder(input_function, lr=0.01, adadelta=False):
-	pass

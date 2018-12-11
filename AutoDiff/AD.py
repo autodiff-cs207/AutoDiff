@@ -6,23 +6,19 @@ class DiffObj(object):
     All functions will be represented by an instance of this class DiffObj, or by instances of
     classes which inherit from DiffObj (e.g. class Variable, class Constant etc.) DiffObj enforces
     that each class which inherits from it, must implement two functions:
-
     CLASS FUNCTIONS
     ==================
     The functions get_val and get_der are exposed to the user, that is, a user of our package can
     call these functions.
-
     (1) get_val:        This is used to evaluate the function represented by a DiffObj instance at
                         a particular point.
                         
     (2) get_der:        This is used to evalate the gradient of the function repreesnted by a DiffObj
                         instance, at a particular point.
-
     CLASS ATTRIBUTES
     ================
     The attributes are not meant to be used by an end-user of our package, and they are meant for internal
     computation.
-
     name_list:          A list of strings, where each item in the list represents the variables inside
                         the function represented by this DiffObj. E.g. for f(x,y) = x + y, the name_list
                         for a DiffObj representing f will be ['x', 'y'] (assuming the x.name_list = ['x']
@@ -46,19 +42,15 @@ class DiffObj(object):
         value_dict:     A dictionary, whose keys are strings representing variables which feature
                         in the formula represented by this DiffObj. The values at those keys are
                         the values at which the formula representing this DiffObj will be evaluated.
-
                         E.g. For a DiffObj which represents the function f(x,y) = x + y, the value_dict
                         argument may look like value_dict = {'x': 10, 'y': 5}
         OUTPUT
         ======
-
         DOCTEST
         ======
         >>> z=x+y
         >>> z.get_val({'x':1,'y':1})
         2
-
-
         result:         A floating point number, which equals the evaluation of the function
                         represented by this DiffObj, at the variable values given by val_dict.
         '''
@@ -119,13 +111,11 @@ class DiffObj(object):
         with_respect_to:    A list of strings representing variables, with respect to which we want the 
                             gradient of this DifObj. By default, if this list is not provided, then the
                             gradient with respect to all variables featuring in the DiffObj is returned.
-
         DOCTEST
         ======
         >>> z=x+y
         >>> z.get_der({'x':0,'y':0})
         {'y': 1, 'x': 1}
-
         '''
         if not with_respect_to: with_respect_to = self.name_list
         df = {}
@@ -261,11 +251,8 @@ class DiffObj(object):
         INPUT
         =====
         Takes a single AutoDiff object (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
-
         a = AutoDiff object
-
         -a
-
         which uses our __neg__ method.
         a.__neg__()
         
@@ -273,7 +260,6 @@ class DiffObj(object):
         ======
         result:         A DiffObj, for which DiffObj.operator_name is 'neg', DiffObj.operand_list 
                         contains [a,a], and DiffObj.name_list is same as the original name_list of a.
-
         DOCTEST
         ======
         >>> z=-y
@@ -287,30 +273,23 @@ class DiffObj(object):
     def __add__(self, other):
         '''
         Overloads the add operator such that it works for DiffObj objects.
-
         INPUT
         =====
         Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
     
         a = AutoDiff object
         b = AutoDiff object
-
         a + b
-
         which uses our __add__ method:
-
         a.__add__(b)
-
         OUTPUT
         ======
         Returns a DiffObj, where the DiffObj.name_list is the concatination of a.name_list and b.name_list,
         DiffObj.operator_name is 'add', and DiffObj.operand_list is [a,b].
-
         When get_val is called on the resulting DiffObj, as in DiffObj.get_val(val_dict), the sum
         DiffObj.operand_list[0].get_val(val_dict) + DiffObj.operand_list[1].get_val(val_dict) is returned.
         In other words, DiffObj.get_val(val_dict) returns the sum of the operands after
         their values are evaluated individually with respect to their own value dictionaries.
-
         DOCTEST
         ======
         >>> z=x+y
@@ -318,7 +297,6 @@ class DiffObj(object):
         5
         >>> z.get_der({'x':3,'y':2})
         {'y': 1, 'x': 1}
-
         '''
 
 
@@ -326,30 +304,22 @@ class DiffObj(object):
     def __sub__(self, other):
         '''
         Overloads the subtract operator such that it works for DiffObj objects.
-
         INPUT
         =====
         Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
-
         a = AutoDiff object
         b = AutoDiff object
-
         a - b
-
         which uses our __sub__ method:
-
         a.__sub__(b)
-
         OUTPUT
         ======
         Returns a DiffObj, where the DiffObj.name_list is the concatination of a.name_list and b.name_list,
         DiffObj.operator_name is 'subtract', and DiffObj.operand_list is [a,b].
-
         When get_val is called on the resulting DiffObj, as in DiffObj.get_val(val_dict), the difference
         DiffObj.operand_list[0].get_val(val_dict) - DiffObj.operand_list[1].get_val(val_dict) is returned.
         In other words, DiffObj.get_val(val_dict) returns the difference of the operands after
         their values are evaluated individually with respect to their own value dictionaries.
-
         DOCTEST
         ======
         >>> z=x-y
@@ -357,7 +327,6 @@ class DiffObj(object):
         1
         >>> z.get_der({'x':3,'y':2})
         {'y': -1, 'x': 1}
-
         '''
         return self.getBinaryOperator(other, 'subtract')
 
@@ -367,31 +336,22 @@ class DiffObj(object):
     def __mul__(self, other):
         '''
         Overloads the multiply operator such that it works for DiffObj objects.
-
         INPUT
         =====
         Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
-
         a = AutoDiff object
         b = AutoDiff object
-
         a * b
-
         which uses our __mul__ method:
-
         a.__mul__(b)
-
         OUTPUT
         ======  
         Returns a DiffObj, where the DiffObj.name_list is the concatination of a.name_list and b.name_list,
         DiffObj.operator_name is 'multiply', and DiffObj.operand_list is [a,b].
-
         When get_val is called on the resulting DiffObj, as in DiffObj.get_val(val_dict), the product
         DiffObj.operand_list[0].get_val(val_dict) * DiffObj.operand_list[1].get_val(val_dict) is returned.
         In other words, DiffObj.get_val(val_dict) returns the product of the operands after
         their values are evaluated individually with respect to their own value dictionaries.
-
-
         DOCTEST
         ======
         >>> z=x*y
@@ -399,37 +359,28 @@ class DiffObj(object):
         6
         >>> z.get_der({'x':3,'y':2})
         {'y': 3, 'x': 2}
-
         '''
         return self.getBinaryOperator(other, 'multiply')
 
     def __truediv__(self, other):
         '''
         Overloads the division operator such that it works for DiffObj objects.
-
         INPUT
         =====
         Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
-
         a = AutoDiff object
         b = AutoDiff object
-
         a / b
-
         which uses our __truediv__ method:
-
         a.__truediv__(b)
-
         OUTPUT
         ======
         Returns a DiffObj, where the DiffObj.name_list is the concatination of a.name_list and b.name_list,
         DiffObj.operator_name is 'divide', and DiffObj.operand_list is [a,b].
-
         When get_val is called on the resulting DiffObj, as in DiffObj.get_val(val_dict), the division
         DiffObj.operand_list[0].get_val(val_dict) / DiffObj.operand_list[1].get_val(val_dict) is returned.
         In other words, DiffObj.get_val(val_dict) returns the division of the operands after
         their values are evaluated individually with respect to their own value dictionaries.
-
         DOCTEST
         ======
         >>> z=x/y
@@ -438,8 +389,6 @@ class DiffObj(object):
         >>> z.get_der({'x':3,'y':2})
         {'y': -1, 'x': 0}
         >>> 
-
-
         '''
         return self.getBinaryOperator(other, 'divide')
 
@@ -451,8 +400,6 @@ class DiffObj(object):
         return self.__truediv__(other)
         '''
         __div__ for python2 support
-
-
         DOCTEST
         ======
         >>> z=x/y
@@ -461,7 +408,6 @@ class DiffObj(object):
         >>> z.get_der({'x':3,'y':2})
         {'y': -1, 'x': 0}
         >>> 
-
         '''
 
     def __pow__(self, other):
@@ -471,17 +417,13 @@ class DiffObj(object):
         =====
         self, other:        Two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, 
                             AutoDiff.Variable, or AutoDiff.MathOps
-
         Example Usage:
         If a and b are two AutoDiff Objects. Then a**b will use our __pow__ method.
-
-
         OUTPUT
         ======
         result:             A DiffObj where DiffObj.name_list is the concatenation of a.name_list and 
                             b.name_list, DiffObj.operator_name is 'power', and DiffObj.operand_list is
                             [a,b].
-
         DOCTEST
         ======
         >>> z=x*y
@@ -502,23 +444,17 @@ class DiffObj(object):
         '''
         Returns the default value dictionary. Used to determine equality between DiffObj objects that have
         default variable values specified.  
-
         INPUT
         =====
         self:        Takes a AutoDiff object of type AutoDiff.DiffObj.
-
         Example Usage:
         Will be called only in (in)equality tests. For example, if a and b are AutoDiff.DiffObj 
         objects, a==b will call a.__eq__(b), which in turn will call a.get_dict_val() and b.get_dict_val().
         The derivative and value of a and b with then be calculated at their default variable values.
-
-
         OUTPUT
         ======
         result:             A dictionary, where each key is a value in name_list, and each value is the default
                             value that was supplied by the user.
-
-
         DOCTEST
         ======
         >>> x = Variable('x',5)
@@ -541,7 +477,8 @@ class DiffObj(object):
 
                     # each variable should have only one default value
                     if item.var_name in default_val_dict:
-                        raise ValueError("Repeated key: ", item.var_name)
+                        if not default_val_dict[item.var_name] == item.default_val:
+                            raise ValueError("Repeated key: ", item.var_name)
                     default_val_dict[item.var_name]=item.default_val
                 elif isinstance(item,DiffObj):# or str(type(item)) == "<class 'AutoDiff.DiffObj'>" or str(type(item)) == "<class 'AutoDiff.MathOps'>":
                     for operand in item.operand_list:
@@ -559,24 +496,17 @@ class DiffObj(object):
     '''
     EQUALITY OPERATOR BEHAVIOR
     ==========================
-
     __eq__      Returns True if DiffObj have the same derivative and value at their respective default
                 Variable values. Variables must also have the same names. False otherwise.
-
     __ne__      Returns the boolean negation of __eq__.
-
     __gt__      Returns true if the left DiffObj value is greater than the right DiffObj value at their
                 respective default Variable values. False otherwise. 
-
     __lt__      Returns true if the left DiffObj value is less than the right DiffObj value at their
                 respective default Variable values. False otherwise. 
-
     __ge__      Returns true if the left DiffObj value is greater than or equal to the right DiffObj 
                 value at their respective default Variable values. False otherwise. 
-
     __le__      Returns true if the left DiffObj value is less than or equal to the right DiffObj value 
                 at their respective default Variable values. False otherwise. 
-
     DOCTEST
     =======
     >>> x = Variable('x',5)
@@ -602,7 +532,6 @@ class DiffObj(object):
     True
     >>> g >= h
     True
-
     '''
     def __eq__(self,other):
         if not (type(self)==type(other)):
@@ -654,17 +583,14 @@ class Variable(DiffObj):
     All variables inside a function whose derivative and value a user wants to calculate, 
     will be instances of the Variable class, which inherits from DiffObj and implements
     get_val and get_der
-
     CLASS ATTRIBUTES
     ================
     var_name:           A string, which is unique to this Variable instance.
                         E.g. x = Variable('x')
-
     CLASS FUNCTIONS
     ===============
     This implements get_val and get_der, a description of which is provided in the 
     Super-class DiffObj.
-
     '''
     def __init__(self, var_name, default_val=None):
         self.var_name = var_name
@@ -693,24 +619,17 @@ class Variable(DiffObj):
     '''
     EQUALITY OPERATOR BEHAVIOR
     ==========================
-
     __eq__      Returns True if Variables have the same default values and variable names. 
                 False otherwise.
-
     __ne__      Returns the boolean negation of __eq__.
-
     __gt__      Returns true if the left Variable default value is greater than the right Variable 
                 default value. False otherwise. 
-
     __lt__      Returns true if the left Variable default value is less than the right Variable 
                 default value. False otherwise. 
-
     __ge__      Returns true if the left Variable default value is greater than or equal to the 
                 right Variable default value. False otherwise. 
-
     __le__      Returns true if the left Variable default value is less than or equal to the 
                 right Variable default value. False otherwise. 
-
     DOCTEST
     =======
     >>> w = Variable('x',5)
@@ -731,7 +650,6 @@ class Variable(DiffObj):
     True
     >>> x >= y
     True
-
     '''
 
     def __eq__(self,other):
@@ -772,14 +690,11 @@ class Constant(DiffObj):
     All constants inside a function whose derivative and value a user wants to calculate,
     will be instances of the Constant class, which inherits from DiffObj and implements
     get_val and get_der
-
     CLASS ATTRIBUTES
     ================
     const_name:         A string, which is unique to this Constant instance.
     const_val:          An int or float number, which will be the value assigned to this instance.
-
                         E.g. c = Constant('c', 10.0)
-
     CLASS FUNCTIONS
     ===============
     This implements get_val and get_der, a description of which is provided in the
@@ -835,19 +750,15 @@ class MathOps(DiffObj):
     '''
     This class inherits from the DiffObj class. It implements non-elementary unary functions 
     including: sin, cos, tan, log, exp.
-
     INSTANTIATION
     ===============
     If a is of type DiffObj, then the invoking the constructor as follows will return an 
     object b of type MathOps:
-
     b = MathOps.sin(a)
-
     CLASS ATTRIBUTES
     ================
     The attributes are not meant to be used by an end-user of our package, and they are meant for internal
     computation.
-
     name_list:          A list of strings, where each item in the list represents the variables inside
                         the function represented by this DiffObj. E.g. for f(x,y) = x + y, the name_list
                         for a DiffObj representing f will be ['x', 'y'] (assuming the x.name_list = ['x']
@@ -856,7 +767,6 @@ class MathOps(DiffObj):
                         implemented by this class.
     operand_list:       A list of length 1 containing the DiffObj which the user has passed as an argument
                         to one of the classmethods of MathOps.
-
     '''
     def __init__(self, name_list, operator, operand):
         super(MathOps, self).__init__(name_list, 
@@ -879,7 +789,6 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'sin' and whose operand is
                     the DiffObj on which the user had called this sin function.
-
         DOCTEST
         ======
         >>> z=MathOps.sin(x)
@@ -922,7 +831,6 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'tan' and whose operand is
                     the DiffObj on which the user had called this tan function.
-
         DOCTEST
         ======
         
@@ -946,7 +854,6 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'arcsin' and whose operand is
                     the DiffObj on which the user had called this arcsin function.
-
         DOCTEST
         ======
         
@@ -969,7 +876,6 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'arccos' and whose operand is
                     the DiffObj on which the user had called this arccos function.
-
         DOCTEST
         ======
         
@@ -993,7 +899,6 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'arctan' and whose operand is
                     the DiffObj on which the user had called this arctan function.
-
         DOCTEST
         ======
         
@@ -1017,7 +922,6 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'hsin' and whose operand is
                     the DiffObj on which the user had called this hyperbolic sin function.
-
         DOCTEST
         ======
         >>> z=MathOps.hsin(x)
@@ -1060,7 +964,6 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'tanh' and whose operand is
                     the DiffObj on which the user had called this hyperbolic tan function.
-
         DOCTEST
         ======
         
@@ -1084,7 +987,6 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'log' and whose operand is
                     the DiffObj on which the user had called this log function.
-
         DOCTEST
         ======
         >>> z=MathOps.log(x)
@@ -1178,7 +1080,6 @@ class MathOps(DiffObj):
         value_dict:     A dictionary, whose keys are strings representing variables which feature
                         in the formula represented by this DiffObj. The values at those keys are
                         the values at which the formula representing this DiffObj will be evaluated.
-
                         E.g. For a DiffObj which represents the function f(x,y) = x + y, the value_dict
                         argument may look like value_dict = {'x': 10, 'y': 5}
         OUTPUT
@@ -1327,24 +1228,17 @@ class MathOps(DiffObj):
     '''
     EQUALITY OPERATOR BEHAVIOR
     ==========================
-
     __eq__      Returns True if MathOps objects have the same derivative and value at their respective default
                 Variable values. Variables must also have the same names. False otherwise.
-
     __ne__      Returns the boolean negation of __eq__.
-
     __gt__      Returns true if the left MathOps object value is greater than the right MathOps object value at their
                 respective default Variable values. False otherwise. 
-
     __lt__      Returns true if the left MathOps object value is less than the right MathOps object value at their
                 respective default Variable values. False otherwise. 
-
     __ge__      Returns true if the left MathOps object value is greater than or equal to the right MathOps object 
                 value at their respective default Variable values. False otherwise. 
-
     __le__      Returns true if the left MathOps object value is less than or equal to the right MathOps object value 
                 at their respective default Variable values. False otherwise. 
-
     DOCTEST
     =======
     
