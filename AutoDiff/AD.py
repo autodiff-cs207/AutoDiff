@@ -1064,11 +1064,11 @@ class MathOps(DiffObj):
         ======
         result:     A DiffObj, whose operator is 'exp' and whose operand is
                     the DiffObj on which the user had called this exp function.
-        >>> z=MathOps.exp(x)
+        >>> z=MathOps.logistic(x)
         >>> z.get_val({'x':0})
-        1.0
+        0.5
         >>> z.get_der({'x':0})
-        {'x': 1.0}
+        {'x': 0.25}
         '''
 
         return 1/(1 + MathOps.getUnaryOperator('exp', -obj))
