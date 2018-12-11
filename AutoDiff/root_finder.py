@@ -74,14 +74,17 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 			except:
 				logger.warning("Tried to divide by zero!")
 				return
-
-		return ([val_dict[var] for var in vf.name_list], vf.get_val(val_dict), len(error_list), error_list)
+		return_dict = {}
+		for var in vf.name_list:
+			return_dict[var] = val_dict[var]
+		return (return_dict, vf.get_val(val_dict), len(error_list), error_list)
 
 	# function takes value and list, returns true if value is within diff_tol of any value
 	# in the list, false otherwise.
 	def is_close_vector_lists(v,lst,diff_tol=1e-6):
 		for ele in lst:
-			l = [abs(v[i]-ele[i]) for i in range(len(v))]
+			for val in list(ele.keys()):
+				l = [abs(v[val]-ele[val]) for i in range(len(v))]
 			if np.sum(l)<diff_tol:
 				return True
 		return False
@@ -103,8 +106,6 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 
 	# check that we can actually perform Newtons-- same number of equations as 
 	# variables 
-	# print(len(input_function.name_list))
-	# print(len(input_function.list_of_functions))
 
 	if len(input_function.name_list) > len(input_function.list_of_functions):
 		raise TypeError("Cannot find a root if the number of variables is more than vector dimensions. Please specify values for {} variable(s) and try again.".format(
