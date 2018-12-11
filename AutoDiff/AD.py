@@ -4,7 +4,7 @@ import numpy as np
 class DiffObj(object):
     '''
     All functions will be represented by an instance of this class DiffObj, or by instances of
-    classes which inherit from DiffObj (e.g. class Variable, class Constant etc.) DiffObj enforces
+    classes which inherit from DiffObj (e.g. class Variable etc.) DiffObj enforces
     that each class which inherits from it, must implement two functions:
     CLASS FUNCTIONS
     ==================
@@ -250,7 +250,7 @@ class DiffObj(object):
         Overloads negation for objects of type DiffObj.
         INPUT
         =====
-        Takes a single AutoDiff object (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
+        Takes a single AutoDiff object (can be of type AutoDiff.DiffObj, AutoDiff.Variable, or AutoDiff.MathOps):
         a = AutoDiff object
         -a
         which uses our __neg__ method.
@@ -275,7 +275,7 @@ class DiffObj(object):
         Overloads the add operator such that it works for DiffObj objects.
         INPUT
         =====
-        Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
+        Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Variable, or AutoDiff.MathOps):
     
         a = AutoDiff object
         b = AutoDiff object
@@ -306,7 +306,7 @@ class DiffObj(object):
         Overloads the subtract operator such that it works for DiffObj objects.
         INPUT
         =====
-        Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
+        Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Variable, or AutoDiff.MathOps):
         a = AutoDiff object
         b = AutoDiff object
         a - b
@@ -338,7 +338,7 @@ class DiffObj(object):
         Overloads the multiply operator such that it works for DiffObj objects.
         INPUT
         =====
-        Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
+        Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Variable, or AutoDiff.MathOps):
         a = AutoDiff object
         b = AutoDiff object
         a * b
@@ -396,26 +396,12 @@ class DiffObj(object):
     def __rtruediv__(self, other): 
         return self.getBinaryOperator(other, 'rdivide')
 
-    def __div__(self,other):
-        return self.__truediv__(other)
-        '''
-        __div__ for python2 support
-        DOCTEST
-        ======
-        >>> z=x/y
-        >>> z.get_val({'x':3,'y':2})
-        1
-        >>> z.get_der({'x':3,'y':2})
-        {'y': -1, 'x': 0}
-        >>> 
-        '''
-
     def __pow__(self, other):
         '''
         Overloads the power operator such that it works for DiffObj objects.
         INPUT
         =====
-        self, other:        Two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, 
+        self, other:        Two AutoDiff objects (can be of type AutoDiff.DiffObj, 
                             AutoDiff.Variable, or AutoDiff.MathOps
         Example Usage:
         If a and b are two AutoDiff Objects. Then a**b will use our __pow__ method.
@@ -684,38 +670,6 @@ class Variable(DiffObj):
             return self.default_val > other.default_val
         else:
             raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
-
-class Constant(DiffObj):
-    '''
-    All constants inside a function whose derivative and value a user wants to calculate,
-    will be instances of the Constant class, which inherits from DiffObj and implements
-    get_val and get_der
-    CLASS ATTRIBUTES
-    ================
-    const_name:         A string, which is unique to this Constant instance.
-    const_val:          An int or float number, which will be the value assigned to this instance.
-                        E.g. c = Constant('c', 10.0)
-    CLASS FUNCTIONS
-    ===============
-    This implements get_val and get_der, a description of which is provided in the
-    Super-class DiffObj. As expected, get_val simply returns self.const_val while
-    get_der will return 0.
-    '''
-    def __init__(self, const_name, const_val):
-        super(Constant, self).__init__([], None, None)
-        self.const_name = const_name
-        self.const_val = const_val
-        self.name_list = []
-    def get_val(self, value_dict):
-        return self.const_val
-    def get_der(self, value_dict, with_respect_to=None):
-        if not with_respect_to:
-            return {'' : 0}
-        der_dict = {}
-        for w in with_respect_to:
-            der_dict[w] = 0
-        return der_dict
-
 
 class VectorFunction(DiffObj):
     '''
