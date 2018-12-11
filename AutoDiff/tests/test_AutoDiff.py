@@ -343,9 +343,9 @@ class TestAutoDiff():
 		assert(f.get_val(val_dict) == 2)
 		assert(f.get_der(val_dict)['y'] == 0.25)
 		with pytest.raises(ValueError):
-			g.get_der(val_dict)['z']
+                    g.get_der(val_dict)['z']
 		with pytest.raises(ValueError):
-			g.get_val(val_dict)['z']
+                    g.get_val(val_dict)['z']
 
 	def test_exceptions(self):
 		val_dict = {'x' : 10, 'y' : 5}
