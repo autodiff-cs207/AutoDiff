@@ -347,8 +347,6 @@ class TestAutoDiff():
 		with pytest.raises(ValueError):
 			g.get_val(val_dict)['z']
 
-
-
 	def test_exceptions(self):
 		val_dict = {'x' : 10, 'y' : 5}
 		x = Variable('x')
@@ -474,20 +472,3 @@ class TestAutoDiff():
 			assert(a >= 2)
 		with pytest.raises(ValueError):
 			assert(a <= 2)
-
-
-
-
-	
-	
-
-
-
-
-
-
-
-
-
-
-
