@@ -719,7 +719,7 @@ class Constant(DiffObj):
 
 class VectorFunction(DiffObj):
     '''
-    Temporary vector function for use in root_finder.py until code supports vector valued functions
+    Vector function for use in root_finder.py.
     ''' 
     def __init__(self, list_of_functions):
         self.list_of_functions = list_of_functions

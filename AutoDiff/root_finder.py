@@ -1,4 +1,4 @@
-import AutoDiff
+import AD as ad
 from threading import Thread
 import random
 import numpy as np
@@ -36,7 +36,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		val_dict = starting_val_dict
 
 		error_list = []
-		fx = f.get_val(val_dict)
+		fx = vf.get_val(val_dict)
 		it = 0
 		all_dim_dist = math.inf
 
@@ -48,8 +48,8 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 				abs_fx = abs(fx)
 			except:
 				abs_fx = [abs(val) for val in fx]
-			all_dim_dist = np.sum(abs_fx)
-			all_dim_dist = np.linalg.norm(fx,ord=2)
+
+			all_dim_dist = np.linalg.norm([fx],ord=2)
 
 			# make a list of errors so we can check Newton's method is working
 			error_list += [np.sum(abs_fx)]
@@ -83,13 +83,14 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 				return True
 		return False
 
-
-	f = input_function
+	# if user doesn't input a vector function, change type here for
+	if not isinstance(input_function,ad.VectorFunction):
+		input_function = ad.VectorFunction([input_function])
 
 	# adjust starting value list to agree with number of requested starting values 
 	while len(starting_val_dict_list)<num_starting_vals:
 		starting_val_dict_to_add = {}
-		for var in f.name_list:
+		for var in input_function.name_list:
 			starting_val_dict_to_add[var] = random.randint(starting_val_range[0],starting_val_range[1])
 		starting_val_dict_list.append(starting_val_dict_to_add)
 
@@ -101,7 +102,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 	threads = []
 	for i in range(len(starting_val_dict_list)):
 		thread = ThreadWithReturnValue(target=find_root, 
-			args=(f,starting_val_dict_list[i],max_iter,tolerance))
+			args=(input_function,starting_val_dict_list[i],max_iter,tolerance))
 		thread.start()
 		threads.append(thread)
 	for i in range(len(starting_val_dict_list)):
