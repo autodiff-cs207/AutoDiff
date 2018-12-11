@@ -1,7 +1,7 @@
 import pytest 
 import math
 import numpy as np
-from AutoDiff import DiffObj, Variable, Constant, VectorFunction
+from AutoDiff import DiffObj, Variable, VectorFunction
 from AutoDiff import MathOps as mo
 from AutoDiff.root_finder import ThreadWithReturnValue, vectorNewton
 
@@ -9,7 +9,7 @@ TOL = 1e-6
 
 class TestRootFinder():
     def test_no_roots(self):        
-        c5 = Constant('c5', 5)
+        c5 = 5
         c5_v = VectorFunction([c5])
 
         x = Variable('x')
@@ -30,7 +30,7 @@ class TestRootFinder():
             assert len(roots) == 0
 
     def test_single_root(self):
-        c3 = Constant('c3', 3)
+        c3 = 3
         x = Variable('x')
 
         x_cubed = x ** c3
@@ -54,10 +54,10 @@ class TestRootFinder():
 
     def test_multiple_roots(self):
         x = Variable('x')
-        c1 = Constant('c1', 1)
-        c2 = Constant('c2', 2)
-        c3 = Constant('c3', 5)
-        c4 = Constant('c4', 10)
+        c1 = 1
+        c2 = 2
+        c3 = 5
+        c4 = 10
         f = c3**(c1 + mo.sin(mo.log(c3 + x**c2))) - c4
         roots = vectorNewton(VectorFunction([f]), verbose=False)
         for root in roots:
