@@ -59,7 +59,10 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 				dx = vf.dict_list_to_array(vf.get_der(val_dict))
 
 				# need to update all new values of value dictionary
-				delta = np.linalg.solve(np.array(dx),-1*np.array(fx))
+				try:
+					delta = np.linalg.solve(np.array(dx),-1*np.array(fx))
+				except Exception as e:
+					print(e) 
 
 				# update dictionary
 				for i,val in enumerate(vf.name_list):
@@ -97,6 +100,15 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 	max_iter = 100 # maybe user should be able to choose this? 
 	results = []
 	roots = []
+
+	# check that we can actually perform Newtons-- same number of equations as 
+	# variables 
+	# print(len(input_function.name_list))
+	# print(len(input_function.list_of_functions))
+
+	if len(input_function.name_list) > len(input_function.list_of_functions):
+		raise TypeError("Cannot find a root if the number of variables is more than vector dimensions. Please specify values for {} variable(s) and try again.".format(
+			len(input_function.name_list)-len(input_function.list_of_functions)))
 
 	# start threads 
 	threads = []
