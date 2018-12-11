@@ -1,8 +1,8 @@
 import pytest 
 import math
 import numpy as np
-from AutoDiff import DiffObj, Variable, VectorFunction
-from AutoDiff import MathOps as mo
+from AutoDiff.AD import DiffObj, Variable, VectorFunction
+from AutoDiff.AD import MathOps as mo
 from AutoDiff.root_finder import ThreadWithReturnValue, vectorNewton
 
 TOL = 1e-6
