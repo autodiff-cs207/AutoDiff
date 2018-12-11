@@ -1074,7 +1074,7 @@ class MathOps(DiffObj):
         return MathOps.getUnaryOperator('tanh', obj)
 
     @classmethod
-    def log(cls, obj):
+    def loge(cls, obj):
         '''
         INPUT
         =====
@@ -1095,6 +1095,42 @@ class MathOps(DiffObj):
         '''
 
         return MathOps.getUnaryOperator('log', obj)
+    
+    @classmethod
+    def log(cls, obj, base=None):
+
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the natural log function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'log' and whose operand is
+                    the DiffObj on which the user had called this log function.
+
+        DOCTEST
+        ======
+        >>> z=MathOps.log(x)
+        >>> z.get_val({'x':1})
+        0.0
+        >>> z.get_der({'x':1})
+        {'x': 1.0}
+        '''
+
+        natural_log = MathOps.getUnaryOperator('log', obj)
+        if base is None:
+            return natural_log
+        else:
+            try:
+                tmp = base + 0
+            except:
+                raise ValueError('Base needs to be a strictly positive real number.')
+            if tmp <= 0:
+                raise ValueError('Base needs to be a strictly positive real number.')
+            return natural_log/math.log(base)
+    
+    
     @classmethod
     def exp(cls, obj):
         '''
