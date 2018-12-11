@@ -115,10 +115,11 @@ class TestAutoDiff():
 
 	# test divide 
 	def test_divide(self):
-		val_dict = {'x' : 10, 'y' : 20}
+		val_dict = {'x' : 10, 'y' : 20, 'z':2}
 		x = Variable('x')
 		y = Variable('y')
 		c1 = Constant('c1', 5)
+		z = Variable('z')
 
 		f0 = x/y
 		assert(f0.get_val(val_dict) ==0.5)
@@ -144,6 +145,14 @@ class TestAutoDiff():
 		assert(f4.get_val(val_dict) ==0.1)
 		assert(f4.get_der(val_dict)['x'] == 0.01)
 		assert(f4.get_der(val_dict)['y'] == -0.005)
+
+		f5 = 5/x
+		assert(f5.get_val(val_dict)==0.5)
+		assert(f5.get_der(val_dict)['x']==-.05)
+
+		f6 = 5**z
+		assert(f6.get_val(val_dict) == 25)
+		assert(f6.get_der(val_dict)['z'] == 5**2*math.log(5))
 
 	# test power
 	def test_power(self):
@@ -208,8 +217,6 @@ class TestAutoDiff():
 		assert(f5.get_val(val_dict)) == math.tan(0)
 		assert(f5.get_der(val_dict)['x']) == 1/math.cos(0)**2
 
-
-
 	def test_log(self):
 		val_dict = {'x' : 10, 'y' : 5, 'z' : -1, 'a' : 0}
 		x = Variable('x')
@@ -255,6 +262,19 @@ class TestAutoDiff():
 		assert(f1.get_val(val_dict)==2.0*math.exp(10))
 		assert(f1.get_der(val_dict)['x'] == 2.0*math.exp(10))
 
+	def test_sqrt(self):
+		val_dict = {'x' : 10, 'y' : 4}
+		x = Variable('x')
+		y = Variable('y')
+		c1 = Constant('c1',2.0)	
+		c2 = Constant('c2', 0.0)
+
+		f = mo.sqrt(y)
+
+		assert(f.get_val(val_dict) == 2)
+		assert(f.get_der(val_dict)['y'] == 0.25)
+
+
 
 	def test_exceptions(self):
 		val_dict = {'x' : 10, 'y' : 5}
@@ -262,6 +282,7 @@ class TestAutoDiff():
 		y = Variable('y')
 		c1 = Constant('c1',2.0)	
 		c2 = Constant('c2', 0.0)
+		f = 5
 			
 		with pytest.raises(ValueError):
 			f0 = x/c2
@@ -299,6 +320,75 @@ class TestAutoDiff():
 		f0 = x**c1
 		with pytest.raises(ZeroDivisionError):
 			f0.get_der(val_dict)['x']
+
+
+
+	def test_get_dict_val(self):
+		x = Variable('x', 5)
+		y = Variable('y', 7)
+		z = Variable('x', 7)
+		w = 5
+
+		f = 2*x*y
+		g = 2*x*z
+		assert(f.get_dict_val() == {'x':5, 'y':7})
+
+		with pytest.raises(ValueError):
+			g.get_dict_val()
+
+	def test_equalities(self):
+		x = Variable('x', 5)
+		y = Variable('y', 7)
+		z = Variable('x', 5)
+		w = Variable('y',5)
+		assert(not x==y)
+		assert(x!=y)
+		assert(x==z)
+		assert(x<y)
+		assert(x<=y)
+		assert(x>=z)
+		assert(x!=w)
+
+		f = 5*x
+		g = 10*x
+		h = 5*w
+		assert(not f==g)
+		assert(f!=g)
+		assert(f<=g)
+		assert(f<g)
+		assert(f!=h)
+		assert(h>=f)
+		assert(g>f)
+
+		a = mo.sin(x)
+		b = mo.sin(y)
+		c = mo.sin(z)
+		assert(not a==b)
+		assert(a!=h)
+		assert(a<=b)
+		assert(a<b)
+		assert(b>c)
+		assert(b>=c)
+
+		with pytest.raises(ValueError):
+			assert(a > 2)
+		with pytest.raises(ValueError):
+			assert(a < 2)
+		with pytest.raises(ValueError):
+			assert(a >= 2)
+		with pytest.raises(ValueError):
+			assert(a <= 2)
+
+
+
+
+		
+		
+
+
+
+
+
 
 
 

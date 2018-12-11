@@ -1328,7 +1328,6 @@ class MathOps(DiffObj):
         else:
             raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
 
-
 if __name__ == "__main__":
     import doctest
     doctest.testmod(extraglobs={'x': Variable('x'),'y':Variable('y')})
