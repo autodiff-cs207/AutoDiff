@@ -477,7 +477,7 @@ class DiffObj(object):
 
                     # each variable should have only one default value
                     if item.var_name in default_val_dict:
-                        if not default_val_dict[item.var_name] = item.default_val:
+                        if not default_val_dict[item.var_name] == item.default_val:
                             raise ValueError("Repeated key: ", item.var_name)
                     default_val_dict[item.var_name]=item.default_val
                 elif isinstance(item,DiffObj):# or str(type(item)) == "<class 'AutoDiff.DiffObj'>" or str(type(item)) == "<class 'AutoDiff.MathOps'>":
