@@ -1053,6 +1053,27 @@ class MathOps(DiffObj):
 
         return MathOps.getUnaryOperator('exp', obj)
 
+    @classmethod
+    def logistic(cls, obj):
+        '''
+        INPUT
+        =====
+        obj:        An object of type DiffObj, on which the user wants to
+                    apply the natural exponentiation function.
+        OUTPUT
+        ======
+        result:     A DiffObj, whose operator is 'exp' and whose operand is
+                    the DiffObj on which the user had called this exp function.
+        >>> z=MathOps.exp(x)
+        >>> z.get_val({'x':0})
+        1.0
+        >>> z.get_der({'x':0})
+        {'x': 1.0}
+        '''
+
+        return 1/(1 + MathOps.getUnaryOperator('exp', -obj))
+
+
 
     @classmethod
     def sqrt(cls, obj):
