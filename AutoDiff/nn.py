@@ -1,5 +1,5 @@
-from AutoDiff import DiffObj, Variable, Constant
-from AutoDiff import MathOps as mo
+from AD import DiffObj, Variable
+from AD import MathOps as mo
 import numpy as np
 
 class NeuralNet(object):
