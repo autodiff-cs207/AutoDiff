@@ -1,6 +1,6 @@
 import pytest 
 import math
-from AutoDiff import DiffObj, Variable, Constant
+from AutoDiff import DiffObj, Variable
 from AutoDiff import MathOps as mo
 
 class TestAutoDiff():
@@ -11,7 +11,7 @@ class TestAutoDiff():
 		x = Variable('x')
 		y = Variable('y')
 		z = Variable('z')
-		c1 = Constant('c1', 5)
+		c1 = 5
 
 		f0 = x + y		     
 		assert(f0.get_val(val_dict) ==30)
@@ -48,7 +48,7 @@ class TestAutoDiff():
 		x = Variable('x')
 		y = Variable('y')
 		f0 = x - y	
-		c1 = Constant('c1', 5)
+		c1 = 5
 
 		assert(f0.get_val(val_dict) ==-10)
 		assert(f0.get_der(val_dict)['x'] == 1)
@@ -88,7 +88,7 @@ class TestAutoDiff():
 		val_dict = {'x' : 10, 'y' : 20}
 		x = Variable('x')
 		y = Variable('y')	
-		c1 = Constant('c1', 5)
+		c1 = 5
 
 		f0 = x*y	     
 		assert(f0.get_val(val_dict) ==200)
@@ -121,7 +121,7 @@ class TestAutoDiff():
 		val_dict = {'x' : 10, 'y' : 20, 'z':2}
 		x = Variable('x')
 		y = Variable('y')
-		c1 = Constant('c1', 5)
+		c1 = 5
 		z = Variable('z')
 
 		f0 = x/y
@@ -162,9 +162,9 @@ class TestAutoDiff():
 		val_dict = {'x' : 10.0, 'y' : 3.0}
 		x = Variable('x')
 		y = Variable('y')	
-		c1 = Constant('c1', 2.0)
-		c2 = Constant('c2', -2.0)
-		c3 = Constant('c3', 0.0)
+		c1 = 2.0
+		c2 = -2.0
+		c3 = 0.0
 
 		f0 = x**c1
 		assert(f0.get_val(val_dict) ==100)
@@ -198,9 +198,9 @@ class TestAutoDiff():
 		val_dict = {'x' : 0, 'y' : math.pi/2}
 		x = Variable('x')
 		y = Variable('y')	
-		c1 = Constant('c1', 2.0)
-		c2 = Constant('c2', -2.0)
-		c3 = Constant('c3', 0.0)
+		c1 = 2.0
+		c2 = -2.0
+		c3 = 0.0
 
 		f0 = mo.sin(x)
 		assert(f0.get_val(val_dict) ==0)
@@ -273,7 +273,7 @@ class TestAutoDiff():
 		y = Variable('y')
 		z = Variable('z')
 		a = Variable('a')
-		c1 = Constant('c1',2.0)	
+		c1 = 2.0
 
 		f0 = mo.log(x)
 		assert(f0.get_val(val_dict) ==math.log(10))
@@ -311,8 +311,8 @@ class TestAutoDiff():
 		val_dict = {'x' : 10, 'y' : 5}
 		x = Variable('x')
 		y = Variable('y')
-		c1 = Constant('c1',2.0)	
-		c2 = Constant('c2', 0.0)
+		c1 = 2.0
+		c2 = 0.0
 
 		f0 = mo.exp(x)
 		assert(f0.get_val(val_dict) == math.exp(10))
@@ -334,8 +334,8 @@ class TestAutoDiff():
 		x = Variable('x')
 		y = Variable('y')
 		z = Variable('z')
-		c1 = Constant('c1',2.0)	
-		c2 = Constant('c2', 0.0)
+		c1 = 2.0
+                c2 = 0.0
 
 		f = mo.sqrt(y)
 		g = mo.sqrt(z)
@@ -353,8 +353,8 @@ class TestAutoDiff():
 		val_dict = {'x' : 10, 'y' : 5}
 		x = Variable('x')
 		y = Variable('y')
-		c1 = Constant('c1',2.0)	
-		c2 = Constant('c2', 0.0)
+		c1 = 2.0
+		c2 = 0.0
 		f = 5
 			
 		with pytest.raises(ValueError):
@@ -374,7 +374,7 @@ class TestAutoDiff():
 		val_dict = {'x' : 10, 'y' : 5}
 		x = Variable('x')
 		y = Variable('y')
-		c1 = Constant('c1',2.0)	
+		c1 = 2.0	
 
 		f1 = c1*x
 		f2 = -f1
@@ -390,7 +390,7 @@ class TestAutoDiff():
 		val_dict = {'x' : 0}
 		x = Variable('x')
 		y = Variable('y')
-		c1 = Constant('c1',1/3)
+		c1 = 1/3
 
 		f0 = x**c1
 		with pytest.raises(ZeroDivisionError):
