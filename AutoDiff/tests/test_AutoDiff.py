@@ -79,6 +79,9 @@ class TestAutoDiff():
 		assert(f5.get_der(val_dict)['x'] == 1)
 		assert(f5.get_der(val_dict)['y'] == 0)
 
+		f6 = 6 - x
+		assert(f6.get_val(val_dict)==-4)
+
 
 	# test multiply
 	def test_multiply(self):
@@ -184,6 +187,12 @@ class TestAutoDiff():
 		assert(f2.get_val(val_dict) ==1)
 		assert(f2.get_der(val_dict)['x'] == 0)
 
+		f5 = 2.0**y
+		assert(f5.get_der(val_dict)['y'] == 8*math.log(2))
+
+		f5 = y**2.0
+		assert(f5.get_der(val_dict)['y'] == 6.0)
+
 
 	def test_trig(self):
 		val_dict = {'x' : 0, 'y' : math.pi/2}
@@ -287,10 +296,16 @@ class TestAutoDiff():
 			f2 = mo.log(a)
 			f2.get_der(val_dict)['a']
 
+		with pytest.raises(ValueError):
+			f3 = mo.log(x,-5)
+
 		f3 = mo.log(x,10)
 		assert(f3.get_val(val_dict) ==1)
 		# issue with rounding
 		assert(f3.get_der(val_dict)['x']-(1.0/(10.0*math.log(10)))<1e-10)
+
+		f4 = mo.loge(x)
+		assert(f4.get_val(val_dict) == math.log(10))
 
 	def test_exp(self):
 		val_dict = {'x' : 10, 'y' : 5}
@@ -351,6 +366,8 @@ class TestAutoDiff():
 			f0.get_val({'p':5})
 		with pytest.raises(TypeError):
 			f0.get_val({'x':'hello'})
+		with pytest.raises(TypeError):
+			mo.sin("hello")
 
 
 	def test_neg(self):
@@ -379,13 +396,13 @@ class TestAutoDiff():
 		with pytest.raises(ZeroDivisionError):
 			f0.get_der(val_dict)['x']
 
-
-
 	def test_get_dict_val(self):
+		val_dict = {'x' : 0, 'y':5}
 		x = Variable('x', 5)
 		y = Variable('y', 7)
 		z = Variable('x', 7)
 		w = 5
+		p = Variable('x')
 
 		f = 2*x*y
 		g = 2*x*z
@@ -394,12 +411,15 @@ class TestAutoDiff():
 		with pytest.raises(ValueError):
 			g.get_dict_val()
 
+		assert(p.get_der(val_dict)['x'] == 1)
+
 	def test_equalities(self):
 		x = Variable('x', 5)
 		y = Variable('y', 7)
 		z = Variable('x', 5)
 		w = Variable('y',5)
 		assert(not x==y)
+		assert(not 'a'==y)
 		assert(x!=y)
 		assert(x==z)
 		assert(x<y)
@@ -407,11 +427,20 @@ class TestAutoDiff():
 		assert(x>=z)
 		assert(x!=w)
 		assert(y>x)
+		with pytest.raises(ValueError):
+			assert(x > "hi")
+		with pytest.raises(ValueError):
+			assert(x < "hi")
+		with pytest.raises(ValueError):
+			assert(x >= "hi")
+		with pytest.raises(ValueError):
+			assert(x <= "hi")
 
 		f = 5*x
 		g = 10*x
 		h = 5*w
 		assert(not f==g)
+		assert(not 'a'==f)
 		assert(f!=g)
 		assert(f<=g)
 		assert(f<g)

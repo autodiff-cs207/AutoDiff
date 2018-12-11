@@ -1024,13 +1024,10 @@ class MathOps(DiffObj):
         if base is None:
             return natural_log
         else:
-            try:
-                tmp = base + 0
-            except:
+            if base <= 0:
                 raise ValueError('Base needs to be a strictly positive real number.')
-            if tmp <= 0:
-                raise ValueError('Base needs to be a strictly positive real number.')
-            return natural_log/math.log(base)
+            else:
+                return natural_log/math.log(base)
     
     
     @classmethod
