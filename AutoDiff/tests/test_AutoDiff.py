@@ -334,8 +334,8 @@ class TestAutoDiff():
 		x = Variable('x')
 		y = Variable('y')
 		z = Variable('z')
-                c1 = 2.0
-                c2 = 0.0
+                c1 = 2
+                c2 = 0
 
 		f = mo.sqrt(y)
 		g = mo.sqrt(z)
