@@ -1,5 +1,5 @@
-from AutoDiff import DiffObj, Variable, Constant, VectorFunction
-from AutoDiff import MathOps as mo
+from AD import DiffObj, Variable, VectorFunction
+from AD import MathOps as mo
 import random
 import numpy as np
 import math
