@@ -217,6 +217,48 @@ class TestAutoDiff():
 		assert(f5.get_val(val_dict)) == math.tan(0)
 		assert(f5.get_der(val_dict)['x']) == 1/math.cos(0)**2
 
+	def test_hyperbolic_trig(self):
+		val_dict = {'x' : 0, 'y' : math.pi/2}
+		x = Variable('x')
+		y = Variable('y')	
+
+		f1 = mo.tanh(x)
+		assert(f1.get_val(val_dict) == 0)
+		assert(f1.get_der(val_dict)['x'] == 1)
+
+		f2 = mo.cosh(x)
+		assert(f2.get_val(val_dict) == 1)
+		assert(f2.get_der(val_dict)['x'] == 0)
+
+		f3 = mo.sinh(x)
+		assert(f3.get_val(val_dict) == 0)
+		assert(f3.get_der(val_dict)['x'] == 1)
+
+	def test_inverse_trig(self):
+		val_dict = {'x' : 0, 'y' : -1}
+		x = Variable('x')
+		y = Variable('y')	
+
+		f1 = mo.arctan(x)
+		assert(f1.get_val(val_dict) == 0)
+		assert(f1.get_der(val_dict)['x'] == 1)
+
+		f2 = mo.arccos(x)
+		f21 = mo.arccos(y)
+		assert(f2.get_val(val_dict) == math.pi/2)
+		assert(f2.get_der(val_dict)['x'] == -1)
+		with pytest.raises(ValueError):
+			f21.get_der(val_dict)
+
+		f3 = mo.arcsin(x)
+		f31 = mo.arcsin(y)
+		assert(f3.get_val(val_dict) == 0)
+		assert(f3.get_der(val_dict)['x'] == 1)
+		with pytest.raises(ValueError):
+			f31.get_der(val_dict)
+
+
+
 	def test_log(self):
 		val_dict = {'x' : 10, 'y' : 5, 'z' : -1, 'a' : 0}
 		x = Variable('x')
@@ -262,122 +304,143 @@ class TestAutoDiff():
 		assert(f1.get_val(val_dict)==2.0*math.exp(10))
 		assert(f1.get_der(val_dict)['x'] == 2.0*math.exp(10))
 
+	def test_logistic(self):
+		val_dict = {'x' : 10, 'y' : 5}
+		x = Variable('x')
+		f = mo.logistic(x)
+		assert(f.get_val(val_dict) == 1/(1+math.exp(-10)))
+
 	def test_sqrt(self):
-		val_dict = {'x' : 10, 'y' : 4}
+		val_dict = {'x' : 10, 'y' : 4, 'z':-5}
 		x = Variable('x')
 		y = Variable('y')
+		z = Variable('z')
 		c1 = Constant('c1',2.0)	
 		c2 = Constant('c2', 0.0)
 
 		f = mo.sqrt(y)
+		g = mo.sqrt(z)
 
 		assert(f.get_val(val_dict) == 2)
 		assert(f.get_der(val_dict)['y'] == 0.25)
-
-
-
-	def test_exceptions(self):
-		val_dict = {'x' : 10, 'y' : 5}
-		x = Variable('x')
-		y = Variable('y')
-		c1 = Constant('c1',2.0)	
-		c2 = Constant('c2', 0.0)
-		f = 5
-			
 		with pytest.raises(ValueError):
-			f0 = x/c2
-			f0.get_val(val_dict)
+			g.get_der(val_dict)['z']
 		with pytest.raises(ValueError):
-			f0.get_der(val_dict)['p']
-		with pytest.raises(ValueError):
-			f0.get_val({'p':5})
-		with pytest.raises(TypeError):
-			f0.get_val({'x':'hello'})
-
-
-	def test_neg(self):
-		val_dict = {'x' : 10, 'y' : 5}
-		x = Variable('x')
-		y = Variable('y')
-		c1 = Constant('c1',2.0)	
-
-		f1 = c1*x
-		f2 = -f1
-		assert(f2.get_val(val_dict) == -20.0)
-
-		f3 = x*y
-		f4 = -f3 
-		assert(f4.get_val(val_dict) == -50.0)
-		assert(f4.get_der(val_dict)['x']==-5)
-		assert(f4.get_der(val_dict)['y']==-10)
-
-	def test_divide_by_zero_dir(self):
-		val_dict = {'x' : 0}
-		x = Variable('x')
-		y = Variable('y')
-		c1 = Constant('c1',1/3)
-
-		f0 = x**c1
-		with pytest.raises(ZeroDivisionError):
-			f0.get_der(val_dict)['x']
+			g.get_val(val_dict)['z']
 
 
 
-	def test_get_dict_val(self):
-		x = Variable('x', 5)
-		y = Variable('y', 7)
-		z = Variable('x', 7)
-		w = 5
+		def test_exceptions(self):
+			val_dict = {'x' : 10, 'y' : 5}
+			x = Variable('x')
+			y = Variable('y')
+			c1 = Constant('c1',2.0)	
+			c2 = Constant('c2', 0.0)
+			f = 5
+				
+			with pytest.raises(ValueError):
+				f0 = x/c2
+				f0.get_val(val_dict)
+			with pytest.raises(ValueError):
+				f0.get_der(val_dict)['p']
+			with pytest.raises(ValueError):
+				f0.get_val({'p':5})
+			with pytest.raises(TypeError):
+				f0.get_val({'x':'hello'})
 
-		f = 2*x*y
-		g = 2*x*z
-		assert(f.get_dict_val() == {'x':5, 'y':7})
 
-		with pytest.raises(ValueError):
-			g.get_dict_val()
+		def test_neg(self):
+			val_dict = {'x' : 10, 'y' : 5}
+			x = Variable('x')
+			y = Variable('y')
+			c1 = Constant('c1',2.0)	
 
-	def test_equalities(self):
-		x = Variable('x', 5)
-		y = Variable('y', 7)
-		z = Variable('x', 5)
-		w = Variable('y',5)
-		assert(not x==y)
-		assert(x!=y)
-		assert(x==z)
-		assert(x<y)
-		assert(x<=y)
-		assert(x>=z)
-		assert(x!=w)
+			f1 = c1*x
+			f2 = -f1
+			assert(f2.get_val(val_dict) == -20.0)
 
-		f = 5*x
-		g = 10*x
-		h = 5*w
-		assert(not f==g)
-		assert(f!=g)
-		assert(f<=g)
-		assert(f<g)
-		assert(f!=h)
-		assert(h>=f)
-		assert(g>f)
+			f3 = x*y
+			f4 = -f3 
+			assert(f4.get_val(val_dict) == -50.0)
+			assert(f4.get_der(val_dict)['x']==-5)
+			assert(f4.get_der(val_dict)['y']==-10)
 
-		a = mo.sin(x)
-		b = mo.sin(y)
-		c = mo.sin(z)
-		assert(not a==b)
-		assert(a!=h)
-		assert(a<=b)
-		assert(a<b)
-		assert(b>c)
-		assert(b>=c)
+		def test_divide_by_zero_dir(self):
+			val_dict = {'x' : 0}
+			x = Variable('x')
+			y = Variable('y')
+			c1 = Constant('c1',1/3)
 
-		with pytest.raises(ValueError):
-			assert(a > 2)
-		with pytest.raises(ValueError):
-			assert(a < 2)
-		with pytest.raises(ValueError):
-			assert(a >= 2)
-		with pytest.raises(ValueError):
-			assert(a <= 2)
+			f0 = x**c1
+			with pytest.raises(ZeroDivisionError):
+				f0.get_der(val_dict)['x']
+
+
+
+		def test_get_dict_val(self):
+			x = Variable('x', 5)
+			y = Variable('y', 7)
+			z = Variable('x', 7)
+			w = 5
+
+			f = 2*x*y
+			g = 2*x*z
+			assert(f.get_dict_val() == {'x':5, 'y':7})
+
+			with pytest.raises(ValueError):
+				g.get_dict_val()
+
+		def test_equalities(self):
+			x = Variable('x', 5)
+			y = Variable('y', 7)
+			z = Variable('x', 5)
+			w = Variable('y',5)
+			assert(not x==y)
+			assert(x!=y)
+			assert(x==z)
+			assert(x<y)
+			assert(x<=y)
+			assert(x>=z)
+			assert(x!=w)
+			assert(y>x)
+
+			f = 5*x
+			g = 10*x
+			h = 5*w
+			assert(not f==g)
+			assert(f!=g)
+			assert(f<=g)
+			assert(f<g)
+			assert(f!=h)
+			assert(h>=f)
+			assert(g>f)
+			with pytest.raises(ValueError):
+				assert(f > 2)
+			with pytest.raises(ValueError):
+				assert(f < 2)
+			with pytest.raises(ValueError):
+				assert(f >= 2)
+			with pytest.raises(ValueError):
+				assert(f <= 2)
+
+			a = mo.sin(x)
+			b = mo.sin(y)
+			c = mo.sin(z)
+			assert(not a==b)
+			assert(a!=h)
+			assert(a<=b)
+			assert(a<b)
+			assert(b>c)
+			assert(b>=c)
+
+			with pytest.raises(ValueError):
+				assert(a > 2)
+			with pytest.raises(ValueError):
+				assert(a < 2)
+			with pytest.raises(ValueError):
+				assert(a >= 2)
+			with pytest.raises(ValueError):
+				assert(a <= 2)
 
 
 

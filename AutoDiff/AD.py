@@ -1236,13 +1236,13 @@ class MathOps(DiffObj):
                 dw = func_val*op1.get_der(value_dict, [w])[w]
                 df[w] = dw
         elif self.operator == 'sqrt':
-            func_val = math.sqrt(op1.get_val(value_dict))
-            for w in with_respect_to:
-                try:
+            try:
+                func_val = math.sqrt(op1.get_val(value_dict))
+                for w in with_respect_to:
                     dw = ((1/2.0)* (op1.get_val(value_dict)**(-1/2.0))*(op1.get_der(value_dict, [w])[w]))
                     df[w] = dw
-                except:
-                    raise ValueError('Square root cannot be evaluated on negative numbers.')
+            except:
+                raise ValueError('Square root cannot be evaluated on negative numbers.')
         if len(df) == 0: df = {'' : 0}
         return df
 
