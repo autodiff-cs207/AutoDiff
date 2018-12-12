@@ -38,8 +38,10 @@ class TestAutoDiff():
 		assert(f4.get_der(val_dict)['x'] == 1)
 		assert(f4.get_der(val_dict)['y'] == 1)
 
-		assert(c1.get_der(val_dict, ['x', 'y'])['x'] == 0)
-		assert(c1.get_der(val_dict, ['x', 'y'])['y'] == 0)
+		with pytest.raises(AttributeError):
+			assert(c1.get_der(val_dict, ['x', 'y'])['x'] == 0)
+		with pytest.raises(AttributeError):
+			assert(c1.get_der(val_dict, ['x', 'y'])['y'] == 0)
 
 
 	# test subtract 

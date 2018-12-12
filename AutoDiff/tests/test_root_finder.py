@@ -38,19 +38,19 @@ class TestRootFinder():
         print(x_cubed_roots)
         assert len(x_cubed_roots) == 1
         assert len(x_cubed_roots[0]) == 1
-        assert abs(x_cubed_roots[0][0] ** 3) < TOL
+        assert abs(x_cubed_roots[0]['x'] ** 3) < TOL
 
         x3 = c3 * x
         x3_roots = vectorNewton(VectorFunction([x3]), verbose=False)
         assert len(x3_roots) == 1
         assert len(x3_roots[0]) == 1
-        assert abs(3 * x3_roots[0][0]) < TOL
+        assert abs(3 * x3_roots[0]['x']) < TOL
 
         x9 = c3 * c3 * x
         x9_roots = vectorNewton(VectorFunction([x9]), verbose=False)
         assert len(x9_roots) == 1
         assert len(x9_roots[0]) == 1
-        assert abs(9 * x9_roots[0][0]) < TOL
+        assert abs(9 * x9_roots[0]['x']) < TOL
 
     def test_multiple_roots(self):
         x = Variable('x')
@@ -61,5 +61,5 @@ class TestRootFinder():
         f = c3**(c1 + mo.sin(mo.log(c3 + x**c2))) - c4
         roots = vectorNewton(VectorFunction([f]), verbose=False)
         for root in roots:
-            assert abs(5**(1+ np.sin(np.log(5 + root[0]**2))) - 10) < TOL
+            assert abs(5**(1+ np.sin(np.log(5 + root['x']**2))) - 10) < TOL
 
