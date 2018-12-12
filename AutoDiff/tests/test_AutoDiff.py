@@ -195,6 +195,7 @@ class TestAutoDiff():
 		f5 = y**2.0
 		assert(f5.get_der(val_dict)['y'] == 6.0)
 
+<<<<<<< HEAD
 	def test_rpower(self):
 		val_dict = {'x' : 10.0, 'y' : 3.0}
 		c1 = 2
@@ -203,6 +204,8 @@ class TestAutoDiff():
 		assert(f0.get_val(val_dict) == 1024)
 
 
+=======
+>>>>>>> 6d63259073e78ea1e4612f05067a70c06f837e80
 	def test_trig(self):
 		val_dict = {'x' : 0, 'y' : math.pi/2}
 		x = Variable('x')
