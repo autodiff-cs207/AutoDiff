@@ -1,3 +1,4 @@
 AutoDiff-207-15==0.1
 numpy==1.15.4
 matplotlib==3.0.2
+scipy==0.12.0
