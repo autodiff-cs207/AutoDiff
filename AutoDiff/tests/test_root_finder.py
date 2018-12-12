@@ -3,7 +3,7 @@ import math
 import numpy as np
 from AutoDiff.ad import DiffObj, Variable, VectorFunction
 from AutoDiff.ad import MathOps as mo
-from AutoDiff.root_finder import ThreadWithReturnValue, vectorNewton, pretty_print_results
+from AutoDiff.root_finder import ThreadWithReturnValue, vectorNewton
 
 TOL = 1e-6
 
