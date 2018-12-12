@@ -81,7 +81,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 
 	# function takes value and list, returns true if value is within diff_tol of any value
 	# in the list, false otherwise.
-	def is_close_vector_lists(v,lst,diff_tol=1e-6):
+	def is_close_vector_lists(v,lst,diff_tol=1e-2):
 		for ele in lst:
 			for val in list(ele.keys()):
 				l = [abs(v[val]-ele[val]) for i in range(len(v))]

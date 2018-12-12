@@ -456,7 +456,12 @@ class DiffObj(object):
         next_tree = []
         while True:
             if len(current_tree) == 0:
-                return default_val_dict
+
+                # didnt find key for all variables 
+                if not len(list(default_val_dict.keys())) == len(val_list):
+                    raise ValueError("Missing {} default value(s).".format(len(val_list) -len(list(default_val_dict.keys()))))
+                else:
+                    return default_val_dict
             for item in current_tree:
 
                 if isinstance(item,Variable):# or str(type(item)) == "<class 'AutoDiff.Variable'>":
@@ -472,7 +477,7 @@ class DiffObj(object):
                 elif isinstance(item, int):
                     pass
                 else:
-                    raise ValueError("Unexpected type: " + str(type(item)))
+                    raise ValueError("Can't get default dict if no default values provided.")
 
             current_tree = next_tree
             next_tree = []
@@ -698,6 +703,29 @@ class VectorFunction(DiffObj):
                 row.append(f_dict[var])
             arr.append(row)        
         return arr
+
+    '''
+    EQUALITY OPERATOR BEHAVIOR
+    ==========================
+    __eq__      Returns True if Vector objects have the same derivative and value at their respective default
+                Variable values. Variables must also have the same names. False otherwise.
+    __ne__      Returns the boolean negation of __eq__.
+    __gt__      Returns true if the left Vector object value is greater than the right MathOps object value at their
+                respective default Variable values. False otherwise. 
+    __lt__      Returns true if the left Vector object value is less than the right MathOps object value at their
+                respective default Variable values. False otherwise. 
+    __ge__      Returns true if the left Vector object value is greater than or equal to the right MathOps object 
+                value at their respective default Variable values. False otherwise. 
+    __le__      Returns true if the left Vector object value is less than or equal to the right MathOps object value 
+                at their respective default Variable values. False otherwise. 
+    '''
+    def __eq__(self,other):
+        for i,func in enumerate(self.list_of_functions):
+            print(func)
+            print(other.list_of_functions[i])
+            if not other.list_of_functions[i] == func:
+                return False 
+        return True
 
 
 class MathOps(DiffObj):
