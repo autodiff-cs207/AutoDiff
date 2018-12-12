@@ -451,28 +451,35 @@ class DiffObj(object):
         '''
         default_val_dict = {}
         val_list = self.name_list
+        val_list = list(set(val_list))
+
         tree = self.operand_list
         current_tree = tree
         next_tree = []
         while True:
             if len(current_tree) == 0:
-                return default_val_dict
+
+                # didnt find key for all variables 
+                if not len(list(default_val_dict.keys())) == len(val_list):
+                    raise ValueError("Missing {} default value(s).".format(len(val_list) -len(list(default_val_dict.keys()))))
+                else:
+                    return default_val_dict
             for item in current_tree:
 
-                if isinstance(item,Variable):# or str(type(item)) == "<class 'AutoDiff.Variable'>":
+                if isinstance(item,Variable):
 
                     # each variable should have only one default value
                     if item.var_name in default_val_dict:
                         if not default_val_dict[item.var_name] == item.default_val:
                             raise ValueError("Repeated key: ", item.var_name)
                     default_val_dict[item.var_name]=item.default_val
-                elif isinstance(item,DiffObj):# or str(type(item)) == "<class 'AutoDiff.DiffObj'>" or str(type(item)) == "<class 'AutoDiff.MathOps'>":
+                elif isinstance(item,DiffObj):
                     for operand in item.operand_list:
                         next_tree.append(operand)
                 elif isinstance(item, int):
                     pass
                 else:
-                    raise ValueError("Unexpected type: " + str(type(item)))
+                    raise ValueError("Can't get default dict if no default values provided.")
 
             current_tree = next_tree
             next_tree = []
@@ -698,6 +705,71 @@ class VectorFunction(DiffObj):
                 row.append(f_dict[var])
             arr.append(row)        
         return arr
+
+    '''
+    EQUALITY OPERATOR BEHAVIOR
+    ==========================
+    __eq__      Returns True if Vector objects have the same derivative and value at their respective default
+                Variable values. Variables must also have the same names. False otherwise.
+    __ne__      Returns the boolean negation of __eq__.
+    __gt__      Returns true if the left Vector object value is greater than the right MathOps object value at their
+                respective default Variable values in all dimensions. False otherwise. 
+    __lt__      Returns true if the left Vector object value is less than the right MathOps object value at their
+                respective default Variable values in all dimensions. False otherwise. 
+    __ge__      Returns true if the left Vector object value is greater than or equal to the right MathOps object 
+                value at their respective default Variable values in all dimensions. False otherwise. 
+    __le__      Returns true if the left Vector object value is less than or equal to the right MathOps object value 
+                at their respective default Variable values in all dimensions. False otherwise. 
+    '''
+    def __eq__(self,other):
+        if not (type(self)==type(other)):
+            return False 
+        for i,func in enumerate(self.list_of_functions):
+            if not other.list_of_functions[i] == func:
+                return False 
+        return True
+
+    def __ne__(self,other):
+        if (type(self)==type(other)):
+            return not self.__eq__(other)
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __le__(self,other):
+        if (type(self)==type(other)):
+            for i,func in enumerate(self.list_of_functions):
+                if func > other.list_of_functions[i]:
+                    return False 
+            return True
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __ge__(self,other):
+        if (type(self)==type(other)):
+            for i,func in enumerate(self.list_of_functions):
+                if func < other.list_of_functions[i]:
+                    return False 
+            return True
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __lt__(self,other):
+        if (type(self)==type(other)):
+            for i,func in enumerate(self.list_of_functions):
+                if func >= other.list_of_functions[i]:
+                    return False 
+            return True 
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __gt__(self,other):
+        if (type(self)==type(other)):
+            for i,func in enumerate(self.list_of_functions):
+                if func <= other.list_of_functions[i]:
+                    return False 
+            return True 
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
 
 
 class MathOps(DiffObj):
