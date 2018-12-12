@@ -43,10 +43,6 @@ if __name__=='__main__':
 	x = Variable('x')
 	y = Variable('y')
 	z = Variable('z')
-	c1 = Constant('c1', 1)
-	c2 = Constant('c2', 2)
-	c3 = Constant('c3', 5)
-	c4 = Constant('c4', 10)
 	f_1 = (x-1)**2*(x-2)*2
 	f_2 = (y-3)**3*(y-2)*4
 	f_3 = (z-2)**3*(z-5)*4
