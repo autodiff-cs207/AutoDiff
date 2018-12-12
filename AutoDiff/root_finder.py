@@ -4,6 +4,8 @@ import random
 import numpy as np
 import math
 import logging
+import matplotlib.pyplot as plt
+from scipy.interpolate import interp1d
 
 
 # create a thread object that returns the thread results
@@ -88,6 +90,12 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 				return True
 		return False
 
+	
+	
+	# if user doesn't input a vector function, change type here for
+	if not isinstance(input_function,ad.VectorFunction):
+		input_function = ad.VectorFunction([input_function])
+
 	# check if function is a constant or one component is a constant
 	try:
 		for f in input_function.list_of_functions:
@@ -96,9 +104,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 	except:
 		return []
 
-	# if user doesn't input a vector function, change type here for
-	if not isinstance(input_function,ad.VectorFunction):
-		input_function = ad.VectorFunction([input_function])
+
 
 	# adjust starting value list to agree with number of requested starting values 
 	while len(starting_val_dict_list)<num_starting_vals:
@@ -147,3 +153,33 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		return results
 	else:
 		return roots
+
+# prints results from root finder
+def pretty_print_results(results_list):
+    print("RootFinder found a total of {} roots for the function\n".format(len(results_list))) 
+    
+    if len(results_list) >0:
+        for root in results_list:   
+            print("Found root: {}".format(root[0]))
+            print("Function value at root: {}".format(root[1]))
+            print("Number of iterations needed to find the root: {}".format(root[2]))
+            print("List of error values:{}".format(root[3]))
+
+            plt.title("Error values vs. iteratation number")
+            plt.xlabel("Iteration Number")
+            plt.ylabel("Error Value")
+            print()
+
+            # add smooth line
+            x = list(range(len(root[3])))
+            y = root[3]
+            if(len(x)>2):
+                x_new = np.linspace(min(x), max(x),500)
+                f = interp1d(x, y, kind='quadratic')
+                y_smooth=f(x_new)
+                plt.plot (x_new,y_smooth)      
+            plt.scatter(x,y)
+
+        labels = ["Error for root {}".format(i+1) for i in range(len(results_list))]
+        plt.legend(labels)
+        plt.show()

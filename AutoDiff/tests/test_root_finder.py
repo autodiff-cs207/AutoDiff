@@ -3,7 +3,7 @@ import math
 import numpy as np
 from AutoDiff.ad import DiffObj, Variable, VectorFunction
 from AutoDiff.ad import MathOps as mo
-from AutoDiff.root_finder import ThreadWithReturnValue, vectorNewton
+from AutoDiff.root_finder import ThreadWithReturnValue, vectorNewton, pretty_print_results
 
 TOL = 1e-6
 
@@ -62,4 +62,13 @@ class TestRootFinder():
         roots = vectorNewton(VectorFunction([f]), verbose=False)
         for root in roots:
             assert abs(5**(1+ np.sin(np.log(5 + root['x']**2))) - 10) < TOL
+    def test_print(self):
+        c3 = 3
+        x = Variable('x')
+
+        x_cubed = x ** c3
+        x_cubed_roots = vectorNewton(VectorFunction([x_cubed]), verbose=True, tolerance=TOL**4)
+        pretty_print_results([])
+
+
 

@@ -1,6 +1,6 @@
 import pytest 
 import math
-from AutoDiff.ad import DiffObj, Variable
+from AutoDiff.ad import DiffObj, Variable, VectorFunction
 from AutoDiff.ad import MathOps as mo
 
 class TestAutoDiff():
@@ -454,6 +454,21 @@ class TestAutoDiff():
 			assert(f >= 2)
 		with pytest.raises(ValueError):
 			assert(f <= 2)
+
+
+		f1 = VectorFunction([f,g])
+		f2 = VectorFunction([f,g])
+		f3 = VectorFunction([f,h])
+		t1 = 0
+		t2 = 1 
+		f4 = VectorFunction([t1*f,t1*g])
+		f5 = VectorFunction([t2*f,t2*g])
+		assert(f1==f2)
+		assert(f1!=f3)
+		assert(f3<=f2)
+		assert(f1>=f2)
+		assert(f5>f4)
+		assert(f4<f5)
 
 		a = mo.sin(x)
 		b = mo.sin(y)
