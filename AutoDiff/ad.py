@@ -367,7 +367,7 @@ class DiffObj(object):
         Overloads the division operator such that it works for DiffObj objects.
         INPUT
         =====
-        Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Constant, AutoDiff.Variable, or AutoDiff.MathOps):
+        Takes two AutoDiff objects (can be of type AutoDiff.DiffObj, AutoDiff.Variable, or AutoDiff.MathOps):
         a = AutoDiff object
         b = AutoDiff object
         a / b
