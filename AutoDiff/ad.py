@@ -451,6 +451,8 @@ class DiffObj(object):
         '''
         default_val_dict = {}
         val_list = self.name_list
+        val_list = list(set(val_list))
+
         tree = self.operand_list
         current_tree = tree
         next_tree = []
@@ -464,14 +466,14 @@ class DiffObj(object):
                     return default_val_dict
             for item in current_tree:
 
-                if isinstance(item,Variable):# or str(type(item)) == "<class 'AutoDiff.Variable'>":
+                if isinstance(item,Variable):
 
                     # each variable should have only one default value
                     if item.var_name in default_val_dict:
                         if not default_val_dict[item.var_name] == item.default_val:
                             raise ValueError("Repeated key: ", item.var_name)
                     default_val_dict[item.var_name]=item.default_val
-                elif isinstance(item,DiffObj):# or str(type(item)) == "<class 'AutoDiff.DiffObj'>" or str(type(item)) == "<class 'AutoDiff.MathOps'>":
+                elif isinstance(item,DiffObj):
                     for operand in item.operand_list:
                         next_tree.append(operand)
                 elif isinstance(item, int):
