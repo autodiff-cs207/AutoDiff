@@ -3,13 +3,14 @@ from AutoDiff.ad import MathOps as mo
 import random
 import numpy as np
 import math
-import root_finder
+import ad
+from AutoDiff import root_finder
 
 TOL=0.01
 
 # add on denoise for single root finder
 def denoise_root_finder(f):
-	roots=[item[0] for item in root_finder.vectorNewton(VectorFunction([f]), verbose=False)]
+	roots=[item[f.name_list[0]] for item in root_finder.vectorNewton(VectorFunction([f]), verbose=False)]
 	real_root=[]
 	for i in roots:
 		if len(real_root)==0:
@@ -44,8 +45,9 @@ if __name__=='__main__':
 	y = Variable('y')
 	z = Variable('z')
 	f_1 = (x-1)**2*(x-2)*2
-	f_2 = (y-3)**3*(y-2)*4
-	f_3 = (z-2)**3*(z-5)*4
+	f_2 = (x-3)**3*(x-2)*4
+	f_3 = (x-2)**3*(x-4)*4
 	roots=root_finder_multiple([f_1,f_2,f_3])
 	print(roots)
-	
+	# roots=root_finder.vectorNewton(VectorFunction([f_1]), verbose=False)
+	# print(roots)

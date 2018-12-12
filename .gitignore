@@ -3,5 +3,5 @@
 AutoDiff.egg-info
 build
 dist
-.pyc
+*.pyc
 __pycache__/
