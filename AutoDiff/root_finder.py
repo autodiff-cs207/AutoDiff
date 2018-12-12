@@ -1,4 +1,4 @@
-import AutoDiff
+import AD as ad
 from threading import Thread
 import random
 import numpy as np
@@ -36,7 +36,7 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		val_dict = starting_val_dict
 
 		error_list = []
-		fx = f.get_val(val_dict)
+		fx = vf.get_val(val_dict)
 		it = 0
 		all_dim_dist = math.inf
 
@@ -44,9 +44,12 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		while it < max_iter and all_dim_dist > tol:
 			it += 1
 
-			abs_fx = [abs(val) for val in fx]
-			all_dim_dist = np.sum(abs_fx)
-			all_dim_dist = np.linalg.norm(fx,ord=2)
+			try:
+				abs_fx = abs(fx)
+			except:
+				abs_fx = [abs(val) for val in fx]
+
+			all_dim_dist = np.linalg.norm([fx],ord=2)
 
 			# make a list of errors so we can check Newton's method is working
 			error_list += [np.sum(abs_fx)]
@@ -56,7 +59,10 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 				dx = vf.dict_list_to_array(vf.get_der(val_dict))
 
 				# need to update all new values of value dictionary
-				delta = np.linalg.solve(np.array(dx),-1*np.array(fx))
+				try:
+					delta = np.linalg.solve(np.array(dx),-1*np.array(fx))
+				except Exception as e:
+					print(e) 
 
 				# update dictionary
 				for i,val in enumerate(vf.name_list):
@@ -68,25 +74,29 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 			except:
 				logger.warning("Tried to divide by zero!")
 				return
-
-		return ([val_dict[var] for var in vf.name_list], vf.get_val(val_dict), i, error_list)
+		return_dict = {}
+		for var in vf.name_list:
+			return_dict[var] = val_dict[var]
+		return (return_dict, vf.get_val(val_dict), len(error_list), error_list)
 
 	# function takes value and list, returns true if value is within diff_tol of any value
 	# in the list, false otherwise.
 	def is_close_vector_lists(v,lst,diff_tol=1e-6):
 		for ele in lst:
-			l = [abs(v[i]-ele[i]) for i in range(len(v))]
+			for val in list(ele.keys()):
+				l = [abs(v[val]-ele[val]) for i in range(len(v))]
 			if np.sum(l)<diff_tol:
 				return True
 		return False
 
-
-	f = input_function
+	# if user doesn't input a vector function, change type here for
+	if not isinstance(input_function,ad.VectorFunction):
+		input_function = ad.VectorFunction([input_function])
 
 	# adjust starting value list to agree with number of requested starting values 
 	while len(starting_val_dict_list)<num_starting_vals:
 		starting_val_dict_to_add = {}
-		for var in f.name_list:
+		for var in input_function.name_list:
 			starting_val_dict_to_add[var] = random.randint(starting_val_range[0],starting_val_range[1])
 		starting_val_dict_list.append(starting_val_dict_to_add)
 
@@ -94,11 +104,18 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 	results = []
 	roots = []
 
+	# check that we can actually perform Newtons-- same number of equations as 
+	# variables 
+
+	if len(input_function.name_list) > len(input_function.list_of_functions):
+		raise TypeError("Cannot find a root if the number of variables is more than vector dimensions. Please specify values for {} variable(s) and try again.".format(
+			len(input_function.name_list)-len(input_function.list_of_functions)))
+
 	# start threads 
 	threads = []
 	for i in range(len(starting_val_dict_list)):
 		thread = ThreadWithReturnValue(target=find_root, 
-			args=(f,starting_val_dict_list[i],max_iter,tolerance))
+			args=(input_function,starting_val_dict_list[i],max_iter,tolerance))
 		thread.start()
 		threads.append(thread)
 	for i in range(len(starting_val_dict_list)):
@@ -123,11 +140,3 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		return results
 	else:
 		return roots
-
-
-def quasi_newton(input_function,tolerance):
-	pass
-
-
-def multiple_function_root_finder(input_function, lr=0.01, adadelta=False):
-	pass
