@@ -1,4 +1,4 @@
-import ad
+import VectorFunction
 from threading import Thread
 import random
 import numpy as np
@@ -90,8 +90,8 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 		return False
 
 	# if user doesn't input a vector function, change type here for
-	if not isinstance(input_function,ad.VectorFunction):
-		input_function = ad.VectorFunction([input_function])
+	if not isinstance(input_function,VectorFunction):
+		input_function = VectorFunction([input_function])
 
 	# adjust starting value list to agree with number of requested starting values 
 	while len(starting_val_dict_list)<num_starting_vals:
