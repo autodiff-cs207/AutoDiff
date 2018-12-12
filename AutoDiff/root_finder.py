@@ -1,4 +1,4 @@
-import AD as ad
+import ad
 from threading import Thread
 import random
 import numpy as np
