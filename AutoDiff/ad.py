@@ -713,21 +713,63 @@ class VectorFunction(DiffObj):
                 Variable values. Variables must also have the same names. False otherwise.
     __ne__      Returns the boolean negation of __eq__.
     __gt__      Returns true if the left Vector object value is greater than the right MathOps object value at their
-                respective default Variable values. False otherwise. 
+                respective default Variable values in all dimensions. False otherwise. 
     __lt__      Returns true if the left Vector object value is less than the right MathOps object value at their
-                respective default Variable values. False otherwise. 
+                respective default Variable values in all dimensions. False otherwise. 
     __ge__      Returns true if the left Vector object value is greater than or equal to the right MathOps object 
-                value at their respective default Variable values. False otherwise. 
+                value at their respective default Variable values in all dimensions. False otherwise. 
     __le__      Returns true if the left Vector object value is less than or equal to the right MathOps object value 
-                at their respective default Variable values. False otherwise. 
+                at their respective default Variable values in all dimensions. False otherwise. 
     '''
     def __eq__(self,other):
+        if not (type(self)==type(other)):
+            return False 
         for i,func in enumerate(self.list_of_functions):
-            print(func)
-            print(other.list_of_functions[i])
             if not other.list_of_functions[i] == func:
                 return False 
         return True
+
+    def __ne__(self,other):
+        if (type(self)==type(other)):
+            return not self.__eq__(other)
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __le__(self,other):
+        if (type(self)==type(other)):
+            for i,func in enumerate(self.list_of_functions):
+                if func > other.list_of_functions[i]:
+                    return False 
+            return True
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __ge__(self,other):
+        if (type(self)==type(other)):
+            for i,func in enumerate(self.list_of_functions):
+                if func < other.list_of_functions[i]:
+                    return False 
+            return True
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __lt__(self,other):
+        if (type(self)==type(other)):
+            for i,func in enumerate(self.list_of_functions):
+                if func >= other.list_of_functions[i]:
+                    return False 
+            return True 
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
+
+    def __gt__(self,other):
+        if (type(self)==type(other)):
+            for i,func in enumerate(self.list_of_functions):
+                if func <= other.list_of_functions[i]:
+                    return False 
+            return True 
+        else:
+            raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
 
 
 class MathOps(DiffObj):
