@@ -32,7 +32,6 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 
 	# find one root 
 	def find_root(vf,starting_val_dict, max_iter,tol):
-		
 		val_dict = starting_val_dict
 
 		error_list = []
@@ -88,6 +87,14 @@ def vectorNewton(input_function,tolerance=1e-5, num_starting_vals = 20,
 			if np.sum(l)<diff_tol:
 				return True
 		return False
+
+	# check if function is a constant or one component is a constant
+	try:
+		for f in input_function.list_of_functions:
+			if isinstance(f,int):
+				return []
+	except:
+		return []
 
 	# if user doesn't input a vector function, change type here for
 	if not isinstance(input_function,ad.VectorFunction):

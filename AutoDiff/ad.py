@@ -686,7 +686,11 @@ class VectorFunction(DiffObj):
         self.list_of_functions = list_of_functions
         name_list = []
         for f in self.list_of_functions:
-            name_list = name_list+f.name_list
+            try:
+                name_list = name_list+f.name_list
+            # user added a constant to the vector   
+            except:
+                pass
         name_list = list(set(name_list))
         super(VectorFunction, self).__init__(name_list, None, None)
 
@@ -770,7 +774,6 @@ class VectorFunction(DiffObj):
             return True 
         else:
             raise ValueError("Can't compare objects of {} and {}".format(type(self),type(other)))
-
 
 class MathOps(DiffObj):
     '''
