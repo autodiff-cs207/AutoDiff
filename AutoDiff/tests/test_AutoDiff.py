@@ -195,13 +195,12 @@ class TestAutoDiff():
 		f5 = y**2.0
 		assert(f5.get_der(val_dict)['y'] == 6.0)
 
-        def test_rpower(self):
+	def test_rpower(self):
 		val_dict = {'x' : 10.0, 'y' : 3.0}
-                c1 = 2
-                x = Variable('x')
-
-                f0 = c1**x
-                assert(f0.get_val(val_dict) == 1024)
+		c1 = 2
+		x = Variable('x')
+		f0 = c1**x
+		assert(f0.get_val(val_dict) == 1024)
 
 
 	def test_trig(self):
