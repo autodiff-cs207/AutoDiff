@@ -1,5 +1,5 @@
-from AD import DiffObj, Variable
-from AD import MathOps as mo
+from ad import DiffObj, Variable
+from ad import MathOps as mo
 import numpy as np
 
 class NeuralNet(object):
