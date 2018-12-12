@@ -3,10 +3,9 @@ from AutoDiff.ad import MathOps as mo
 import random
 import numpy as np
 import math
-import ad
 from AutoDiff import root_finder
 
-TOL=0.01
+TOL=0.1
 
 # add on denoise for single root finder
 def denoise_root_finder(f):
@@ -27,6 +26,7 @@ def denoise_root_finder(f):
 def root_finder_multiple(list_of_f):
 	final_list=[]
 	root_list=[denoise_root_finder(f) for f in list_of_f]
+	# print(root_list)
 	for candidates in root_list[0]:
 		count=0
 		for compare_group in root_list[1:]:
@@ -41,13 +41,14 @@ def root_finder_multiple(list_of_f):
 # quasi newton method
 
 if __name__=='__main__':
-	x = Variable('x')
+	x = Variable('x') 
 	y = Variable('y')
 	z = Variable('z')
-	f_1 = (x-1)**2*(x-2)*2
-	f_2 = (x-3)**3*(x-2)*4
-	f_3 = (x-2)**3*(x-4)*4
+	f_1 = (x-1)**3*(x-2)
+	f_2 = (x-1)**4*(x-2)
+	f_3 = (x-1)**5*(x-2)
+	# print(root_finder.vectorNewton(VectorFunction([f_1]), verbose=False))
 	roots=root_finder_multiple([f_1,f_2,f_3])
 	print(roots)
-	# roots=root_finder.vectorNewton(VectorFunction([f_1]), verbose=False)
-	# print(roots)
+	# assert(len(roots)==2)
+ 	# assert((((abs(roots[0]-2)<TOL) and (abs(roots[1]-3)<TOL)) or ((abs(roots[0]-3)<TOL) and (abs(roots[1]-2)<TOL))))
