@@ -68,7 +68,6 @@ class TestRootFinder():
 
         x_cubed = x ** c3
         x_cubed_roots = vectorNewton(VectorFunction([x_cubed]), verbose=True, tolerance=TOL**4)
-        pretty_print_results([])
 
 
 
